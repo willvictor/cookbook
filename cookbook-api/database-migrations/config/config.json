@@ -1,0 +1,18 @@
+{
+  "development": {
+    "username": "postgres",
+    "password": null,
+    "database": "cookbook",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "username": "postgres TODO",
+    "password": null,
+    "database": "cookbook TODO",
+    "host": "127.0.0.1 TODO",
+    "dialect": "postgres TODO",
+    "operatorsAliases": false
+  }
+}
