@@ -1,11 +1,17 @@
 import express from "express";
+import graphqlHTTP from "express-graphql";
+import {createSchema} from "./GraphQLSchema";
 
-const app: express.Application = express();
+const app = express();
 
-app.get("/", (request, response) => {
-    response.send("Hello world");
-})
+const schema = createSchema()
 
-app.listen(2000, () => {
-    console.log("Cookbook server is listening on port 2000");
-})
+app.use(
+  '/graphql',
+  graphqlHTTP({
+    schema: schema,
+    graphiql: true,
+  }),
+);
+
+app.listen(2000);
