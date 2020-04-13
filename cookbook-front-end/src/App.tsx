@@ -1,29 +1,34 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
+import { makeStyles } from '@material-ui/core/styles';
+import {Container, AppBar, Typography, Button, Toolbar, IconButton} from '@material-ui/core';
+import MenuIcon from '@material-ui/icons/Menu';
+import Recipes from './Components/Recipes';
 
-const GET_RECIPES = gql`
-  {
-    recipes {
-      id,
-      name
-    }
+const useStyles = makeStyles({
+  menuButton: {
+  },
+  title: {
   }
-`;
+});
+
 
 const App = () => {
-  const { loading, error, data } = useQuery(GET_RECIPES);
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error {error.message}</p>;
+  const classes = useStyles();
   return <>
-    <div className="App">
-      <ul>
-        {data.recipes.map((r : any) => <li>{r.name}</li>)}
-      </ul>
-    </div>
-  </>;
+    <Container maxWidth="md">
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton edge="start" className={classes.menuButton} color="inherit" aria-label="menu">
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" className={classes.title}>
+            Cookbook
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Recipes/>
+    </Container>
+    </>;
 }
 
 export default App;
