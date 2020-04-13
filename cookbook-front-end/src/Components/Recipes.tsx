@@ -1,7 +1,7 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Card, CardHeader, CardContent, CircularProgress, createMuiTheme} from '@material-ui/core';
-import { useQuery } from '@apollo/react-hooks';
+import {Card, CardHeader, CardActions, Button, CircularProgress, createMuiTheme} from '@material-ui/core';
+import { useQuery, useApolloClient} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 const theme = createMuiTheme();
@@ -27,6 +27,7 @@ const GET_RECIPES = gql`
 const Recipes = () => {
   const classes = useStyles();
   const { loading, error, data } = useQuery(GET_RECIPES);
+  const client = useApolloClient();
   if(loading) return <CircularProgress/>;
   if(error) return <span>oh no, an error occured</span>;
   return <>
@@ -34,6 +35,18 @@ const Recipes = () => {
             {data.recipes.map((r: any) => {
                 return <Card className = {classes.cardRoot}>
                     <CardHeader title={r.name}/>
+                    <CardActions>
+                        <Button 
+                            size="small"
+                            onClick={()=> client.writeData({
+                                data: {
+                                    visiblePage: 2,
+                                    recipeId: r.id
+                                },
+                            })}>
+                            View Recipe
+                        </Button>
+                    </CardActions>
                 </Card>
             })}
         </div>
