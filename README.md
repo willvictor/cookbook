@@ -2,7 +2,7 @@
 A web application for Chris D and Will V's recipes. Includes:
 1. A node.js (express) backend API 
 
-a. using graphql (express-graphql) as a declarative API query language to reduce API footprint for common data fetching and creation
+    a. using graphql (express-graphql) as a declarative API query language to reduce API footprint for common data fetching and creation
 
 2. A create-react-app front end
     
