@@ -1,13 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import App, {Panels} from './App';
 import * as serviceWorker from './serviceWorker';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
+import { InMemoryCache } from 'apollo-cache-inmemory';
 
+const cache = new InMemoryCache();
 const client = new ApolloClient({
   uri: 'http://localhost:3000/graphql',
+  cache: cache
 });
+
+const data = {
+  currentPanel: Panels.browseRecipes,
+  recipeDetailId: null
+};
+cache.writeData({ data });
 
 ReactDOM.render(
   <ApolloProvider client={client}>

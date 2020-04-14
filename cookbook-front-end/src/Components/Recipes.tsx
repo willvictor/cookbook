@@ -1,19 +1,19 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Card, CardHeader, CardActions, Button, CircularProgress, createMuiTheme} from '@material-ui/core';
+import {Card, CardHeader, CardActions, Button, CircularProgress} from '@material-ui/core';
 import { useQuery, useApolloClient} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import {Panels} from '../App';
 
-const theme = createMuiTheme();
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     recipesRoot: {
 
     },
     cardRoot: {
         marginTop: theme.spacing(2)
     },
-});
+}));
 
 const GET_RECIPES = gql`
   {
@@ -33,15 +33,15 @@ const Recipes = () => {
   return <>
         <div className={classes.recipesRoot}>
             {data.recipes.map((r: any) => {
-                return <Card className = {classes.cardRoot}>
+                return <Card className = {classes.cardRoot} key={r.id}>
                     <CardHeader title={r.name}/>
                     <CardActions>
                         <Button 
                             size="small"
                             onClick={()=> client.writeData({
                                 data: {
-                                    visiblePage: 2,
-                                    recipeId: r.id
+                                    currentPanel: Panels.recipeDetail,
+                                    recipeDetailId: r.id
                                 },
                             })}>
                             View Recipe
