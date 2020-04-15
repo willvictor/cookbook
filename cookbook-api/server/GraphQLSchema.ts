@@ -5,7 +5,9 @@ import { GraphQLObjectType,
     GraphQLString } from 'graphql';
 import { resolver } from "graphql-sequelize";
 const models = require("../database-migrations/models");
-  
+
+
+
 const createSchema = () => {
     const RecipeType = new GraphQLObjectType({
         name: 'Recipe',
@@ -33,9 +35,32 @@ const createSchema = () => {
             }
         })
     });
+
+    const MutationType = new GraphQLObjectType({
+        name: 'Mutation',
+        fields: () => ({
+            createRecipe: {
+                type: RecipeType,
+                args: {
+                  name: {type: GraphQLString},
+                  ingredients: {type: GraphQLString},
+                  directions: {type: GraphQLString}
+                },
+                resolve: async (root, args) => {
+                  const newRecipe = models.Recipe.build({
+                      name: args.name,
+                      ingredients: args.ingredients,
+                      directions: args.directions
+                  });
+                  return await newRecipe.save();
+                }
+            }
+        })
+    });
         
     return new GraphQLSchema({
         query: QueryType,
+        mutation: MutationType
     });
 };
 
