@@ -16,12 +16,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const GET_RECIPES = gql`
-  {
+query Recipes{
     recipes {
-      id,
-      name
+        id,
+        name
     }
-  }
+}
 `;
 
 const Recipes = () => {

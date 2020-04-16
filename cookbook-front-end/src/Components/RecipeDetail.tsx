@@ -14,6 +14,15 @@ const useStyles = makeStyles((theme) => ({
       textAlign: 'center',
     },
 }));
+const GET_RECIPES = gql`
+query Recipe($recipeDetailId: Int){
+    recipe(id:$recipeDetailId) {
+        id,
+        name,
+        ingredients,
+        directions
+    }
+}`;
 
 
 export interface Props {
@@ -21,17 +30,8 @@ export interface Props {
 }
 
 const RecipeDetail = (props: Props) => {
-    const GET_RECIPES = gql`
-    {
-        recipe(id:${props.recipeDetailId}) {
-            id,
-            name,
-            ingredients,
-            directions
-        }
-    }`;
     const classes = useStyles();
-    const { loading, error, data } = useQuery(GET_RECIPES);
+    const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: props.recipeDetailId}});
     if(loading) return <CircularProgress/>;
     if(error) return <span>Oh No! An Error Occurred</span>;
     return  <div className={classes.root}>
