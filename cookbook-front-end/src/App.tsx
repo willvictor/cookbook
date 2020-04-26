@@ -1,13 +1,14 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Container, AppBar, Typography, Toolbar, IconButton} from '@material-ui/core';
+import {Container, AppBar, Typography, Toolbar, IconButton, Button} from '@material-ui/core';
 import HomeIcon from '@material-ui/icons/Home';
 import AddIcon from '@material-ui/icons/Add';
 import Recipes from './Components/Recipes';
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
+import {GoogleLogin} from 'react-google-login';
 
 export enum Panels {
   browseRecipes = 1,
@@ -15,12 +16,22 @@ export enum Panels {
   createRecipe = 3,
 }
 
-const GET_VISIBLE_PANEL = gql`
+const GET_STATE = gql`
   {
     currentPanel @client,
-    recipeDetailId @client
+    recipeDetailId @client,
+    userIsLoggedIn @client
   }
 `;
+
+const LOGIN = gql`
+    mutation Login($googleTokenId: String!,$firstName: String!,$lastName: String!,$email: String!,$imageUrl: String!){
+        login(googleTokenId:$googleTokenId,firstName:$firstName,lastName:$lastName,email:$email,imageUrl:$imageUrl){
+            firstName,
+            lastName,
+            imageUrl
+        }
+    }`; 
 
 const useStyles = makeStyles({
   root: {
@@ -39,7 +50,19 @@ const useStyles = makeStyles({
 
 const App = () => {
   const classes = useStyles();
-  const { data, client } = useQuery(GET_VISIBLE_PANEL);
+  const {data, client} = useQuery(GET_STATE);
+  const [login, { data : loginData, loading : loginLoading}] = useMutation(
+    LOGIN, 
+    {
+      update: (cache, mutationResult) => {
+        console.log(mutationResult);
+        cache.writeData({
+            data: {
+                userIsLoggedIn: true
+            }
+        });
+      }
+    });
   return <>
     <Container maxWidth="md">
       <AppBar position="static" className={classes.root}>
@@ -71,6 +94,27 @@ const App = () => {
             })}>
             <AddIcon />
           </IconButton>
+          {!data.userIsLoggedIn
+          && 
+          <GoogleLogin
+                onSuccess={(googleUser: any) => login(
+                  {
+                    variables: {
+                      googleTokenId: googleUser.getAuthResponse().id_token,
+                      firstName: googleUser.profileObj.givenName,
+                      lastName: googleUser.profileObj.familyName,
+                      email: googleUser.profileObj.email,
+                      imageUrl: googleUser.profileObj.imageUrl
+                    }
+                  })
+                }
+                onFailure={(response) => console.log("failed to login google user")}
+                clientId = "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com"
+                render={renderProps => (
+                  <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit" >Login</Button>
+                )}
+                cookiePolicy={'single_host_origin'}/>
+          }
         </Toolbar>
       </AppBar>
       {data.currentPanel === Panels.browseRecipes && <Recipes/>}

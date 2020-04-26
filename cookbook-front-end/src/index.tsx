@@ -14,7 +14,8 @@ const client = new ApolloClient({
 
 const data = {
   currentPanel: Panels.browseRecipes,
-  recipeDetailId: null
+  recipeDetailId: null,
+  userIsLoggedIn: null
 };
 cache.writeData({ data });
 
