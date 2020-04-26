@@ -59,7 +59,6 @@ const createSchema = () => {
                     userId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
-                    console.log(root);
                     const newRecipe = models.Recipe.build({
                         name: args.name,
                         ingredients: args.ingredients,

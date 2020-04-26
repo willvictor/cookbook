@@ -84,18 +84,20 @@ const App = () => {
           <Typography variant="h6" className={classes.title}>
             Cookbook
           </Typography>
-          <IconButton 
-            edge="start" 
-            className={classes.addButton} 
-            color="inherit" 
-            aria-label="add"
-            onClick={() => client.writeData({
-              data: {
-                currentPanel: Panels.createRecipe
-              }
-            })}>
-            <AddIcon />
-          </IconButton>
+          {data.userIsLoggedIn
+            && 
+            <IconButton 
+              edge="start" 
+              className={classes.addButton} 
+              color="inherit" 
+              aria-label="add"
+              onClick={() => client.writeData({
+                data: {
+                  currentPanel: Panels.createRecipe
+                }
+              })}>
+              <AddIcon />
+            </IconButton>}
           {!data.userIsLoggedIn
           && 
           <GoogleLogin
@@ -117,7 +119,7 @@ const App = () => {
       </AppBar>
       {data.currentPanel === Panels.browseRecipes && <Recipes/>}
       {data.currentPanel === Panels.recipeDetail && <RecipeDetail recipeDetailId={data.recipeDetailId}/>}
-      {data.currentPanel === Panels.createRecipe && <CreateRecipe/>}
+      {data.currentPanel === Panels.createRecipe && data.userIsLoggedIn && <CreateRecipe/>}
 
       <Snackbar open={loginToastOpen} autoHideDuration={3000} onClose={() => setLoginToastOpen(false)}>
         <Alert onClose={() => setLoginToastOpen(false)} severity="success">

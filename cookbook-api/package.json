@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "start": "node .built/Server.js",
+    "compile": "tsc && node .built/Server.js",
+    "dev": "nodemon -e ts --exec \"npm run compile\"",
     "dbup": "node ./database-migrations/migrations/RunMigrations.js"
   },
   "author": "Will Victor and Chris Dieckhaus",
@@ -31,6 +32,7 @@
   },
   "devDependencies": {
     "@types/express-session": "^1.17.0",
-    "@types/graphql": "^14.5.0"
+    "@types/graphql": "^14.5.0",
+    "nodemon": "^2.0.3"
   }
 }
