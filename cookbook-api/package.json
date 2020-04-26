@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "@types/express-session": "^1.17.0",
-    "@types/graphql": "^14.5.0",
-    "sequelize-cli": "^5.5.1"
+    "@types/graphql": "^14.5.0"
   }
 }
