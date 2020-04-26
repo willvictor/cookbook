@@ -24,14 +24,17 @@ const useStyles = makeStyles((theme) => ({
     directions: {
         minWidth: "100%",
     },
+    imageUrl: {
+        minWidth: "100%",
+    },
     inputField: {
         marginBottom: theme.spacing(2)
     }
 }));
 
 const SUBMIT_RECIPE = gql`
-    mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!){
-        createRecipe(name:$name, directions:$directions, ingredients: $ingredients){
+    mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!, $imageUrl: String){
+        createRecipe(name:$name, directions:$directions, ingredients: $ingredients, imageUrl: $imageUrl){
             recipeId
         }
     }`; 
@@ -41,6 +44,7 @@ const CreateRecipe = () => {
     const [name, setName] = useState("Recipe Name");
     const [ingredients, setIngredients] = useState("1 egg, 2 cups milk..." );
     const [directions, setDirections] = useState("Combine Eggs and milk, then heat over medium flame...");
+    const [imageUrl, setImageUrl] = useState("Paste a url for an image hosted somewhere (like imgr)");
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
@@ -87,10 +91,19 @@ const CreateRecipe = () => {
                     multiline={true}
                     onChange={(e) => setDirections(e.target.value)}/>
                 </div>
+                <div className={classes.inputField}>
+                    <TextField 
+                    variant="outlined" 
+                    label="Image Url" 
+                    defaultValue="Paste a url for an image hosted somewhere (like imgr)" 
+                    className={classes.imageUrl}
+                    multiline={true}
+                    onChange={(e) => setImageUrl(e.target.value)}/>
+                </div>
                 <Button 
                     color="primary" 
                     variant="contained"
-                    onClick={() => submitRecipe({variables: {name, directions, ingredients}})}> 
+                    onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
                     Create New Recipe 
                 </Button>
             </Paper>

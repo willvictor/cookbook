@@ -27,6 +27,11 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             field: "directions"
         },
+        imageUrl: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            field: "image_url"
+        },
         dateCreated: { 
             type: DataTypes.DATE, 
             defaultValue: DataTypes.NOW,
@@ -44,7 +49,7 @@ module.exports = function (sequelize, DataTypes) {
         createdAt: "date_created"
     });
     Recipe.associate = function (models) {
-        Recipe.belongsTo(models.User, {
+        Recipe.User = Recipe.belongsTo(models.User, {
             foreignKey: {
                 name: 'user_id'
             }

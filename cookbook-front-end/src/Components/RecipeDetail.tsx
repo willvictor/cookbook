@@ -1,18 +1,19 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Grid, Paper, CircularProgress} from '@material-ui/core';
+import {Grid, Paper, CircularProgress, CardMedia, Typography} from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-      flexGrow: 1,
-      marginTop: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        padding: theme.spacing(2)
     },
-    paper: {
-      padding: theme.spacing(2),
-      textAlign: 'center',
-    },
+    media: {
+        height: 400,
+        width: 400,
+        borderRadius: 10
+    }
 }));
 const GET_RECIPES = gql`
 query Recipe($recipeDetailId: Int){
@@ -20,7 +21,12 @@ query Recipe($recipeDetailId: Int){
         recipeId,
         name,
         ingredients,
-        directions
+        directions,
+        imageUrl,
+        creator {
+            firstName,
+            lastName
+        }
     }
 }`;
 
@@ -34,27 +40,35 @@ const RecipeDetail = (props: Props) => {
     const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: props.recipeDetailId}});
     if(loading) return <CircularProgress/>;
     if(error) return <span>Oh No! An Error Occurred</span>;
-    return  <div className={classes.root}>
+    return   <Paper className={classes.root}>
         <Grid container spacing={3}>
-            <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                    <h1>{data.recipe.name}</h1>
-                </Paper>
+            <Grid item xs={6}>
+                <Grid container spacing={3}>
+                    <Grid item>
+                        <Typography variant="h3">{data.recipe.name}</Typography>
+                        <Typography variant="subtitle1">Created by {data.recipe.creator.firstName} {data.recipe.creator.lastName}</Typography>
+                    </Grid>
+                    
+                    <Grid item>
+                        <Typography variant="h5">Ingredients</Typography>
+                        <Typography variant="body1">{data.recipe.ingredients}</Typography>
+                    </Grid>
+
+                    <Grid item>
+                        <Typography variant="h5">Directions</Typography>
+                        <Typography variant="body1">{data.recipe.directions}</Typography>
+                    </Grid>
+                </Grid>
             </Grid>
             <Grid item xs={6}>
-                <Paper className={classes.paper}>
-                    <h4>Ingredients</h4>
-                    <p>{data.recipe.ingredients}</p>
-                </Paper>
-            </Grid>
-            <Grid item xs={6}>
-                <Paper className={classes.paper}>
-                    <h4>Directions</h4>
-                    <p>{data.recipe.directions}</p>
-                </Paper>
+                <CardMedia
+                    className={classes.media}
+                    image={data.recipe.imageUrl}
+                    title={data.recipe.name}
+                />
             </Grid>
         </Grid>
-    </div>;
+    </Paper>;
 }
 
 export default RecipeDetail;

@@ -10,15 +10,6 @@ const {OAuth2Client} = require('google-auth-library');
 
 
 const createSchema = () => {
-    const RecipeType = new GraphQLObjectType({
-        name: 'Recipe',
-        fields: () => ({
-            recipeId: {type: GraphQLInt},
-            name: {type: GraphQLString},
-            ingredients: {type: GraphQLString},
-            directions: {type: GraphQLString},
-        })
-    });
     const UserType = new GraphQLObjectType({
         name: 'User',
         fields: () => ({
@@ -27,6 +18,21 @@ const createSchema = () => {
             email: {type: GraphQLString},
             imageUrl: {type: GraphQLString},
             googleSubId: {type: GraphQLString}
+        })
+    });
+
+    const RecipeType = new GraphQLObjectType({
+        name: 'Recipe',
+        fields: () => ({
+            recipeId: {type: GraphQLInt},
+            name: {type: GraphQLString},
+            ingredients: {type: GraphQLString},
+            directions: {type: GraphQLString},
+            imageUrl: {type: GraphQLString},
+            creator: { 
+                type: UserType,
+                resolve: resolver(models.Recipe.User)
+            }
         })
     });
         
@@ -56,6 +62,7 @@ const createSchema = () => {
                     name: {type: GraphQLString},
                     ingredients: {type: GraphQLString},
                     directions: {type: GraphQLString},
+                    imageUrl: {type: GraphQLString},
                     userId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
@@ -63,6 +70,7 @@ const createSchema = () => {
                         name: args.name,
                         ingredients: args.ingredients,
                         directions: args.directions,
+                        imageUrl: args.imageUrl,
                         userId: root.session.userId
                     });
                     return await newRecipe.save();
