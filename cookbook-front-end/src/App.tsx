@@ -48,11 +48,21 @@ const useStyles = makeStyles({
   }
 });
 
+const updateUrl = (state: any) => {
+  const params = 
+    state.currentPanel === Panels.recipeDetail && state.recipeDetailId
+    ? `?recipeDetailId=${state.recipeDetailId}`
+    : "";
+  window.history.pushState({}, "", `/${Panels[state.currentPanel]}${params}`);
+}
 
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
   const {data, client} = useQuery(GET_STATE);
+  if (data){
+    updateUrl(data);
+  }
   const [login, { data : loginData, loading : loginLoading}] = useMutation(
     LOGIN, 
     {

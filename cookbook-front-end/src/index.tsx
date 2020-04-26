@@ -12,11 +12,20 @@ const client = new ApolloClient({
   cache: cache
 });
 
+const url = new URL(window.location.href);
+let currentPanel = !!(Panels as any)[(url.pathname as string).replace(/\//g,"")] 
+  ? (Panels as any)[(url.pathname as string).replace(/\//g,"")] 
+  : Panels.browseRecipes;
+const recipeDetailId = url.searchParams.get("recipeDetailId") 
+  ? parseInt(url.searchParams.get("recipeDetailId") as string)
+  : null;
+
 const data = {
-  currentPanel: Panels.browseRecipes,
-  recipeDetailId: null,
-  userIsLoggedIn: null
+  currentPanel: currentPanel,
+  recipeDetailId: recipeDetailId,
+  userIsLoggedIn: false
 };
+console.log(data);
 cache.writeData({ data });
 
 ReactDOM.render(
