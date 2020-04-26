@@ -18,7 +18,7 @@ const useStyles = makeStyles((theme) => ({
 const GET_RECIPES = gql`
 query Recipes{
     recipes {
-        id,
+        recipeId,
         name
     }
 }
@@ -33,7 +33,7 @@ const Recipes = () => {
   return <>
         <div className={classes.recipesRoot}>
             {data.recipes.map((r: any) => {
-                return <Card className = {classes.cardRoot} key={r.id}>
+                return <Card className = {classes.cardRoot} key={r.recipeId}>
                     <CardHeader title={r.name}/>
                     <CardActions>
                         <Button 
@@ -41,7 +41,7 @@ const Recipes = () => {
                             onClick={()=> client.writeData({
                                 data: {
                                     currentPanel: Panels.recipeDetail,
-                                    recipeDetailId: r.id
+                                    recipeDetailId: r.recipeId
                                 },
                             })}>
                             View Recipe

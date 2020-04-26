@@ -5,6 +5,7 @@ import { GraphQLObjectType,
     GraphQLString } from 'graphql';
 import { resolver } from "graphql-sequelize";
 const models = require("../database-migrations/models");
+const {OAuth2Client} = require('google-auth-library');
 
 
 
@@ -12,7 +13,7 @@ const createSchema = () => {
     const RecipeType = new GraphQLObjectType({
         name: 'Recipe',
         fields: () => ({
-            id: {type: GraphQLInt},
+            recipeId: {type: GraphQLInt},
             name: {type: GraphQLString},
             ingredients: {type: GraphQLString},
             directions: {type: GraphQLString},
@@ -25,7 +26,7 @@ const createSchema = () => {
             lastName: {type: GraphQLString},
             email: {type: GraphQLString},
             imageUrl: {type: GraphQLString},
-            google_token_id: {type: GraphQLString}
+            googleSubId: {type: GraphQLString}
         })
     });
         
@@ -35,7 +36,7 @@ const createSchema = () => {
             recipe: {
                 type: RecipeType,
                 args: {
-                    id: {type: GraphQLInt}
+                    recipeId: {type: GraphQLInt}
                 },
                 resolve: resolver(models.Recipe)
             }, 
@@ -52,32 +53,37 @@ const createSchema = () => {
             createRecipe: {
                 type: RecipeType,
                 args: {
-                  name: {type: GraphQLString},
-                  ingredients: {type: GraphQLString},
-                  directions: {type: GraphQLString}
+                    name: {type: GraphQLString},
+                    ingredients: {type: GraphQLString},
+                    directions: {type: GraphQLString},
+                    userId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
-                  const newRecipe = models.Recipe.build({
-                    name: args.name,
-                    ingredients: args.ingredients,
-                    directions: args.directions
-                  });
-                  return await newRecipe.save();
+                    console.log(root);
+                    const newRecipe = models.Recipe.build({
+                        name: args.name,
+                        ingredients: args.ingredients,
+                        directions: args.directions,
+                        userId: root.session.userId
+                    });
+                    return await newRecipe.save();
                 }
             },
             login: {
                 type: UserType,
                 args: {
                     googleTokenId: {type: GraphQLString},
-                    firstName: {type: GraphQLString},
-                    lastName: {type: GraphQLString},
-                    email: {type: GraphQLString},
-                    imageUrl: {type: GraphQLString},
                 },
                 resolve: async (root, args) => {
-                    const existingUsers = models.User.findAll({
+                    const client = new OAuth2Client("984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com");
+                    const ticket = await client.verifyIdToken({
+                        idToken: args.googleTokenId,
+                        audience: "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com",
+                    });
+                    const payload = ticket.getPayload();
+                    const existingUsers = await models.User.findAll({
                         where: {
-                            googleTokenId: args.googleTokenId
+                            googleSubId: payload['sub']
                         }
                     });
                     let user;
@@ -86,17 +92,17 @@ const createSchema = () => {
                     }
                     else{
                         const newUser = models.User.build({
-                            firstName: args.firstName,
-                            lastName: args.lastName,
-                            email: args.email,
-                            imageUrl: args.imageUrl,
-                            googleTokenId: args.googleTokenId
+                            firstName: payload['given_name'],
+                            lastName: payload['family_name'],
+                            email: payload['email'],
+                            imageUrl: payload['picture'],
+                            googleSubId: payload['sub']
                         });
                         await newUser.save();
                         user = newUser;
                     }
                     root.session.isAuthenticated = true;
-                    root.userId = user.id;
+                    root.session.userId = user.userId;
                     return user;
                 }
             }

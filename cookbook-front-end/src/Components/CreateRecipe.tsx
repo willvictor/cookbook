@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
 const SUBMIT_RECIPE = gql`
     mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!){
         createRecipe(name:$name, directions:$directions, ingredients: $ingredients){
-            id
+            recipeId
         }
     }`; 
 
@@ -47,7 +47,7 @@ const CreateRecipe = () => {
                 cache.writeData({
                     data: {
                         currentPanel: Panels.recipeDetail,
-                        recipeDetailId: mutationResult.data.createRecipe.id
+                        recipeDetailId: mutationResult.data.createRecipe.recipeId
                     }
                 });
             }

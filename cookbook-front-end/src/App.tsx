@@ -26,8 +26,8 @@ const GET_STATE = gql`
 `;
 
 const LOGIN = gql`
-    mutation Login($googleTokenId: String!,$firstName: String!,$lastName: String!,$email: String!,$imageUrl: String!){
-        login(googleTokenId:$googleTokenId,firstName:$firstName,lastName:$lastName,email:$email,imageUrl:$imageUrl){
+    mutation Login($googleTokenId: String!){
+        login(googleTokenId:$googleTokenId){
             firstName,
             lastName,
             imageUrl
@@ -102,11 +102,7 @@ const App = () => {
                 onSuccess={(googleUser: any) => login(
                   {
                     variables: {
-                      googleTokenId: googleUser.getAuthResponse().id_token,
-                      firstName: googleUser.profileObj.givenName,
-                      lastName: googleUser.profileObj.familyName,
-                      email: googleUser.profileObj.email,
-                      imageUrl: googleUser.profileObj.imageUrl
+                      googleTokenId: googleUser.getAuthResponse().id_token
                     }
                   })
                 }

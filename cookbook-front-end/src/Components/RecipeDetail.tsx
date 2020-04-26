@@ -16,8 +16,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 const GET_RECIPES = gql`
 query Recipe($recipeDetailId: Int){
-    recipe(id:$recipeDetailId) {
-        id,
+    recipe(recipeId:$recipeDetailId) {
+        recipeId,
         name,
         ingredients,
         directions
