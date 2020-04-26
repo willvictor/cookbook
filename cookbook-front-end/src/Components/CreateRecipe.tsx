@@ -9,19 +9,20 @@ import {Panels} from '../App';
 const useStyles = makeStyles((theme) => ({
     paper: {
         paddingBottom: theme.spacing(2),
-        paddingLeft: theme.spacing(2)
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2)
     },
     header: {
         textAlign: 'center'
     },
     name: {
-        minWidth: "50%"
+        minWidth: "100%"
     },
     ingredients: {
-        minWidth: "50%",
+        minWidth: "100%",
     },
     directions: {
-        minWidth: "50%",
+        minWidth: "100%",
     },
     inputField: {
         marginBottom: theme.spacing(2)
