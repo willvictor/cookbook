@@ -8,7 +8,7 @@
     "tsc": "tsc",
     "compile": "tsc && node .built/Server.js",
     "dev": "nodemon -e ts --exec \"npm run compile\"",
-    "dbup": "node ./database-migrations/migrations/RunMigrations.js"
+    "dbup": "node ./domain/migrations/RunMigrations.js"
   },
   "author": "Will Victor and Chris Dieckhaus",
   "license": "ISC",
