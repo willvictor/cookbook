@@ -31,18 +31,21 @@ const runDbUp = async () => {
             )`);
     }
 
-    const scriptsRun =  
+    const alreadyRunScripts =  
         (await sequelize.query(
             `SELECT script_name FROM public.script_history`
             , { type: QueryTypes.SELECT })
         ).map(sr => sr.script_name);
 
     const scriptsDir = path.join(__dirname, 'scripts');
-    fs
+    const filesToExecute = fs
         .readdirSync(scriptsDir)
         .filter(file => {
-            return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-4) === '.sql') && (!scriptsRun.includes(file));
-        })
+            return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-4) === '.sql') && (!alreadyRunScripts.includes(file));
+        });
+    filesToExecute.sort(); //make sure we run the scripts in order!
+    
+    filesToExecute
         .forEach(file => {
             const scriptFilePath = path.join(scriptsDir, file);
             fs.readFile(scriptFilePath, 'utf8', (err, data) => {
