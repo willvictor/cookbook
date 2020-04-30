@@ -25,7 +25,6 @@ const data = {
   recipeDetailId: recipeDetailId,
   userIsLoggedIn: false
 };
-console.log(data);
 cache.writeData({ data });
 
 ReactDOM.render(
