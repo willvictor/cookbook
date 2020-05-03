@@ -28,7 +28,7 @@ This app is still pretty far away from being deployed, but right now it's on goo
 3. pull the repo, and run `cd cookbook-api`. Then run `npm install` (this should install all packages for the cookbook api).
 4. now `cd ../cookbook-front-end`. Then run `npm install`. (should install all packages for the cookbook-front-end).
 5. run dbup: `cd cookbook-api` and `npm run dbup`
-6. run the cookbook-api server within `cookbook-api` run `npm dev`
+6. run the cookbook-api server within `cookbook-api` run `npm run dev`
 7. in a new tab, change directories to `cookbook-front-end` and run `npm start`
 8. go to localhost:3000/ and hopefully you see the app (with no recipes yet!) try adding some recipes and seeing if the app works!
  
