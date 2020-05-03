@@ -2,11 +2,10 @@
   "name": "cookbook-api",
   "version": "1.0.0",
   "description": "the typescript express web application to serve an api for the cookbook website",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "compile": "tsc && node .built/Server.js",
+    "compile": "tsc && node .built/server/Server.js",
     "dev": "nodemon -e ts --exec \"npm run compile\"",
     "dbup": "node ./domain/migrations/RunMigrations.js"
   },
@@ -27,7 +26,9 @@
     "graphql-sequelize": "^9.4.0",
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
+    "reflect-metadata": "^0.1.13",
     "sequelize": "^5.21.6",
+    "sequelize-typescript": "^1.1.0",
     "typescript": "^3.8.3"
   },
   "devDependencies": {
