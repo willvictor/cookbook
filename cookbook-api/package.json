@@ -23,7 +23,6 @@
     "googleapis": "^49.0.0",
     "graphql": "^14.6.0",
     "graphql-relay": "^0.6.0",
-    "graphql-sequelize": "^9.4.0",
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
     "reflect-metadata": "^0.1.13",
