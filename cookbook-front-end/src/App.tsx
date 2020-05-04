@@ -17,16 +17,8 @@ import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
 import {GoogleLogin} from 'react-google-login';
 
-export enum Panels {
-  browseRecipes = 1,
-  recipeDetail = 2,
-  createRecipe = 3,
-}
-
 const GET_STATE = gql`
   {
-    currentPanel @client,
-    recipeDetailId @client,
     userIsLoggedIn @client
   }
 `;
