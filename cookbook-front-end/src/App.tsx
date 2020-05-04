@@ -49,7 +49,7 @@ const useStyles = makeStyles({
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data, client} = useQuery(GET_STATE);
+  const {data} = useQuery(GET_STATE);
 
   const [login, { data : loginData, loading : loginLoading}] = useMutation(
     LOGIN, 

@@ -1,10 +1,9 @@
 import React from 'react';
-import { Link, useRouteMatch, Switch, Route } from 'react-router-dom';
+import { Link, useRouteMatch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {Card, CardHeader, CardActions, CircularProgress, CardMedia} from '@material-ui/core';
 import { useQuery, useApolloClient} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import RecipeDetail from './RecipeDetail';
 
 
 const useStyles = makeStyles((theme) => ({
