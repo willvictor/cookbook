@@ -121,7 +121,7 @@ const App = () => {
         <Route path="/recipes/:recipeDetailId">
           <RecipeDetail />
         </Route>
-        {/* TODO Need to AUTH protect this endpoint */}
+        {/* #20 Need to AUTH protect this endpoint */}
         <Route path="/create">
           <CreateRecipe />
         </Route>
