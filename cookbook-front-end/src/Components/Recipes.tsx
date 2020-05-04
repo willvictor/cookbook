@@ -4,7 +4,7 @@ import {Card, CardHeader, CardActions, Button, CircularProgress, CardMedia} from
 import { useQuery, useApolloClient} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import {Panels} from '../App';
-
+import Error from './Error';
 
 const useStyles = makeStyles((theme) => ({
     recipesRoot: {
@@ -38,8 +38,14 @@ const Recipes = () => {
   const classes = useStyles();
   const { loading, error, data } = useQuery(GET_RECIPES);
   const client = useApolloClient();
-  if(loading) return <CircularProgress/>;
-  if(error) return <span>oh no, an error occured</span>;
+  if (loading) {
+      return <CircularProgress/>;
+  }
+
+  if (error) {
+    return <Error errorMessage={error.message} />;
+  }
+
   return <>
         <div className={classes.recipesRoot}>
             {data.recipes.map((r: any) => {
