@@ -4,7 +4,7 @@ import { GraphQLObjectType,
     GraphQLList,
     GraphQLString } from 'graphql';
 import { resolver } from "graphql-sequelize";
-const models = require("../database-migrations/models");
+const models = require("../domain/models");
 const {OAuth2Client} = require('google-auth-library');
 
 
