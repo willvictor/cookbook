@@ -31,17 +31,9 @@ query Recipe($recipeDetailId: Int){
     }
 }`;
 
-
-// export interface Props {
-//     recipeDetailId: number
-// }
-
 const RecipeDetail = () => {
-    console.log("Hey we're in recipe detail");
-
     let { recipeDetailId } = useParams();
     recipeDetailId = parseInt(recipeDetailId);
-    console.log("recipeDetailId: " + recipeDetailId);
 
     const classes = useStyles();
     const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: recipeDetailId}});

@@ -43,10 +43,6 @@ const Recipes = () => {
   if(loading) return <CircularProgress/>;
   if(error) return <span>oh no, an error occured</span>;
 
-  console.log("In recipes");
-  console.log(path);
-  console.log(url);
-
   return <>
         <div className={classes.recipesRoot}>
           {data.recipes.map((r: any) => {
