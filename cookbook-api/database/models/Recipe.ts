@@ -20,9 +20,9 @@ export class Recipe extends Model<Recipe> {
     @Column({
         type: DataTypes.INTEGER,
         allowNull: false,
-        field: "user_id"
+        field: "creator_id"
     })
-    userId: number;
+    creatorId: number;
 
     @Column({
         type: DataTypes.STRING,

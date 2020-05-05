@@ -67,7 +67,7 @@ const createSchema = () => {
                     ingredients: {type: GraphQLString},
                     directions: {type: GraphQLString},
                     imageUrl: {type: GraphQLString},
-                    userId: {type: GraphQLInt}
+                    creatorId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
                     const newRecipe = Recipe.build({
@@ -75,7 +75,7 @@ const createSchema = () => {
                         ingredients: args.ingredients,
                         directions: args.directions,
                         imageUrl: args.imageUrl,
-                        userId: root.session.userId
+                        creatorId: root.session.userId
                     });
                     return await newRecipe.save();
                 }
