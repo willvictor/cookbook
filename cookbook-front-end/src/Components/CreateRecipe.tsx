@@ -3,7 +3,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Container, Paper, TextField, CircularProgress, Button} from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import {Panels} from '../App';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -51,7 +50,6 @@ const CreateRecipe = () => {
             update: (cache, mutationResult) => {
                 cache.writeData({
                     data: {
-                        currentPanel: Panels.recipeDetail,
                         recipeDetailId: mutationResult.data.createRecipe.recipeId
                     }
                 });

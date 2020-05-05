@@ -3,16 +3,18 @@ import { GraphQLObjectType,
     GraphQLInt,
     GraphQLList,
     GraphQLString } from 'graphql';
-import { resolver } from "graphql-sequelize";
-const models = require("../database-migrations/models");
-const {OAuth2Client} = require('google-auth-library');
+import {getSequelizeInstance} from '../database/SequelizeFactory';
+import { User } from '../database/models/User';
+import { Recipe } from '../database/models/Recipe';
+import {OAuth2Client} from 'google-auth-library';
 
-
+const sequelize = getSequelizeInstance();
 
 const createSchema = () => {
     const UserType = new GraphQLObjectType({
         name: 'User',
         fields: () => ({
+            
             firstName: {type: GraphQLString},
             lastName: {type: GraphQLString},
             email: {type: GraphQLString},
@@ -29,10 +31,7 @@ const createSchema = () => {
             ingredients: {type: GraphQLString},
             directions: {type: GraphQLString},
             imageUrl: {type: GraphQLString},
-            creator: { 
-                type: UserType,
-                resolve: resolver(models.Recipe.User)
-            }
+            creator: { type: UserType }
         })
     });
         
@@ -44,11 +43,15 @@ const createSchema = () => {
                 args: {
                     recipeId: {type: GraphQLInt}
                 },
-                resolve: resolver(models.Recipe)
+                resolve: async (root, args) => {
+                    return await Recipe.findByPk(args.recipeId, {include: [User]});
+                }
             }, 
             recipes: {
                 type: new GraphQLList(RecipeType),
-                resolve: resolver(models.Recipe)
+                resolve: async (root, args) => {
+                    return await Recipe.findAll();
+                }
             }
         })
     });
@@ -63,15 +66,15 @@ const createSchema = () => {
                     ingredients: {type: GraphQLString},
                     directions: {type: GraphQLString},
                     imageUrl: {type: GraphQLString},
-                    userId: {type: GraphQLInt}
+                    creatorId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
-                    const newRecipe = models.Recipe.build({
+                    const newRecipe = Recipe.build({
                         name: args.name,
                         ingredients: args.ingredients,
                         directions: args.directions,
                         imageUrl: args.imageUrl,
-                        userId: root.session.userId
+                        creatorId: root.session.userId
                     });
                     return await newRecipe.save();
                 }
@@ -88,26 +91,17 @@ const createSchema = () => {
                         audience: "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com",
                     });
                     const payload = ticket.getPayload();
-                    const existingUsers = await models.User.findAll({
-                        where: {
-                            googleSubId: payload['sub']
-                        }
-                    });
-                    let user;
-                    if (existingUsers.length > 0){
-                        user = existingUsers[0];
-                    }
-                    else{
-                        const newUser = models.User.build({
+                    if (!payload) throw "payload should not be null";
+                    const [user, created] = await User.findOrCreate({
+                        where: { googleSubId: payload['sub'] },
+                        defaults: {
                             firstName: payload['given_name'],
                             lastName: payload['family_name'],
                             email: payload['email'],
                             imageUrl: payload['picture'],
                             googleSubId: payload['sub']
-                        });
-                        await newUser.save();
-                        user = newUser;
-                    }
+                        }
+                    });
                     root.session.isAuthenticated = true;
                     root.session.userId = user.userId;
                     return user;

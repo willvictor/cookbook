@@ -4,6 +4,7 @@ import {Grid, Paper, CircularProgress, CardMedia, Typography} from '@material-ui
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Error from './Error';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -31,14 +32,12 @@ query Recipe($recipeDetailId: Int){
     }
 }`;
 
+const RecipeDetail = () => {
+    let { recipeDetailId } = useParams();
+    recipeDetailId = parseInt(recipeDetailId);
 
-export interface Props {
-    recipeDetailId: number
-}
-
-const RecipeDetail = (props: Props) => {
     const classes = useStyles();
-    const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: props.recipeDetailId}});
+    const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: recipeDetailId}});
     
     if (loading) {
       return <CircularProgress/>;

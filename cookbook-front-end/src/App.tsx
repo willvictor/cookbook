@@ -1,4 +1,10 @@
 import React, {useState} from 'react';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 import {Container, AppBar, Typography, Toolbar, IconButton, Button, Snackbar} from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
@@ -11,16 +17,8 @@ import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
 import {GoogleLogin} from 'react-google-login';
 
-export enum Panels {
-  browseRecipes = 1,
-  recipeDetail = 2,
-  createRecipe = 3,
-}
-
 const GET_STATE = gql`
   {
-    currentPanel @client,
-    recipeDetailId @client,
     userIsLoggedIn @client
   }
 `;
@@ -48,21 +46,11 @@ const useStyles = makeStyles({
   }
 });
 
-const updateUrl = (state: any) => {
-  const params = 
-    state.currentPanel === Panels.recipeDetail && state.recipeDetailId
-    ? `?recipeDetailId=${state.recipeDetailId}`
-    : "";
-  window.history.pushState({}, "", `/${Panels[state.currentPanel]}${params}`);
-}
-
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data, client} = useQuery(GET_STATE);
-  if (data){
-    updateUrl(data);
-  }
+  const {data} = useQuery(GET_STATE);
+
   const [login, { data : loginData, loading : loginLoading}] = useMutation(
     LOGIN, 
     {
@@ -75,7 +63,8 @@ const App = () => {
         setLoginToastOpen(true);
       }
     });
-  return <>
+
+  return <Router>
     <Container maxWidth="md">
       <AppBar position="static" className={classes.root}>
         <Toolbar>
@@ -83,13 +72,10 @@ const App = () => {
             edge="start" 
             className={classes.menuButton} 
             color="inherit" 
-            aria-label="home" 
-            onClick={() => client.writeData({
-              data: {
-                currentPanel: Panels.browseRecipes
-              }
-            })}>
-            <HomeIcon />
+            aria-label="home">
+            <Link to="/">
+              <HomeIcon />
+            </Link>
           </IconButton>
           <Typography variant="h6" className={classes.title}>
             Cookbook
@@ -100,13 +86,10 @@ const App = () => {
               edge="start" 
               className={classes.addButton} 
               color="inherit" 
-              aria-label="add"
-              onClick={() => client.writeData({
-                data: {
-                  currentPanel: Panels.createRecipe
-                }
-              })}>
-              <AddIcon />
+              aria-label="add">
+              <Link to="/create">
+                <AddIcon />
+              </Link>
             </IconButton>}
           {!data.userIsLoggedIn
           && 
@@ -127,9 +110,22 @@ const App = () => {
           }
         </Toolbar>
       </AppBar>
-      {data.currentPanel === Panels.browseRecipes && <Recipes/>}
-      {data.currentPanel === Panels.recipeDetail && <RecipeDetail recipeDetailId={data.recipeDetailId}/>}
-      {data.currentPanel === Panels.createRecipe && data.userIsLoggedIn && <CreateRecipe/>}
+
+      <Switch>
+        <Route exact path="/recipes">
+          <Recipes />
+        </Route>
+        <Route exact path="/">
+          <Recipes />
+        </Route>
+        <Route path="/recipes/:recipeDetailId">
+          <RecipeDetail />
+        </Route>
+        {/* #20 Need to AUTH protect this endpoint */}
+        <Route path="/create">
+          <CreateRecipe />
+        </Route>
+      </Switch>
 
       <Snackbar open={loginToastOpen} autoHideDuration={3000} onClose={() => setLoginToastOpen(false)}>
         <Alert onClose={() => setLoginToastOpen(false)} severity="success">
@@ -137,7 +133,7 @@ const App = () => {
         </Alert>
       </Snackbar>
     </Container>
-    </>;
+  </Router>;
 }
 
 export default App;
