@@ -1,20 +1,21 @@
-const fs = require('fs');
-const path = require('path');
-const Sequelize = require('sequelize');
-const  { QueryTypes } = require('sequelize');
-const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+import {QueryTypes} from 'sequelize';
+import {getSequelizeInstance} from '../SequelizeFactory';
+import * as path from 'path';
+import * as fs from 'fs';
 
-let sequelize;
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], config);
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, config);
+interface Exists{
+    exists: boolean;
+}
+interface ScriptName {
+    script_name: string;
 }
 
+const basename = path.basename(__filename);
+
+var sequelize = getSequelizeInstance();
 const runDbUp = async () => {
-    const hasScriptsHistoryTable = await sequelize.query(
+
+    const hasScriptsHistoryTable = await sequelize.query<Exists>(
         `SELECT EXISTS 
         (
             SELECT 1
@@ -22,6 +23,7 @@ const runDbUp = async () => {
             WHERE table_schema = 'public'
             AND table_name = 'script_history'
         );`, { type: QueryTypes.SELECT });
+
     if (!hasScriptsHistoryTable[0].exists){
         await sequelize.query(
             `CREATE TABLE public.script_history
@@ -32,7 +34,7 @@ const runDbUp = async () => {
     }
 
     const alreadyRunScripts =  
-        (await sequelize.query(
+        (await sequelize.query<ScriptName>(
             `SELECT script_name FROM public.script_history`
             , { type: QueryTypes.SELECT })
         ).map(sr => sr.script_name);
