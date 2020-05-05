@@ -8,7 +8,6 @@ import { User } from '../database/models/User';
 import { Recipe } from '../database/models/Recipe';
 import {OAuth2Client} from 'google-auth-library';
 
-
 const sequelize = getSequelizeInstance();
 
 const createSchema = () => {

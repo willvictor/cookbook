@@ -1,9 +1,9 @@
 import React from 'react';
+import { Link, useRouteMatch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import {Card, CardHeader, CardActions, Button, CircularProgress, CardMedia} from '@material-ui/core';
+import {Card, CardHeader, CardActions, CircularProgress, CardMedia} from '@material-ui/core';
 import { useQuery, useApolloClient} from '@apollo/react-hooks';
 import gql from 'graphql-tag';
-import {Panels} from '../App';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,35 +35,29 @@ query Recipes{
 `;
 
 const Recipes = () => {
+  let { path, url } = useRouteMatch();
+
   const classes = useStyles();
   const { loading, error, data } = useQuery(GET_RECIPES);
   const client = useApolloClient();
   if(loading) return <CircularProgress/>;
   if(error) return <span>oh no, an error occured</span>;
+
   return <>
         <div className={classes.recipesRoot}>
-            {data.recipes.map((r: any) => {
-                return <Card className = {classes.cardRoot} key={r.recipeId}>
-                    <CardHeader title={r.name} className={classes.cardTitle}/>
-                    <CardActions>
-                        <Button 
-                            size="small"
-                            onClick={()=> client.writeData({
-                                data: {
-                                    currentPanel: Panels.recipeDetail,
-                                    recipeDetailId: r.recipeId
-                                },
-                            })}>
-                            View Recipe
-                        </Button>
-                    </CardActions>
-                    <CardMedia
-                        className={classes.media}
-                        image={r.imageUrl}
-                        title={r.name}
-                    />
-                </Card>
-            })}
+          {data.recipes.map((r: any) => {
+              return <Card className = {classes.cardRoot} key={r.recipeId}>
+                  <CardHeader title={r.name} className={classes.cardTitle}/>
+                  <CardActions>
+                      <Link to={`recipes/${r.recipeId}`}>View recipe</Link>
+                  </CardActions>
+                  <CardMedia
+                      className={classes.media}
+                      image={r.imageUrl}
+                      title={r.name}
+                  />
+              </Card>
+          })}
         </div>
     </>;
 }

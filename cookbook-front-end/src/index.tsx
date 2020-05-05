@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App, {Panels} from './App';
+import App from './App';
 import * as serviceWorker from './serviceWorker';
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
@@ -12,17 +12,7 @@ const client = new ApolloClient({
   cache: cache
 });
 
-const url = new URL(window.location.href);
-let currentPanel = !!(Panels as any)[(url.pathname as string).replace(/\//g,"")] 
-  ? (Panels as any)[(url.pathname as string).replace(/\//g,"")] 
-  : Panels.browseRecipes;
-const recipeDetailId = url.searchParams.get("recipeDetailId") 
-  ? parseInt(url.searchParams.get("recipeDetailId") as string)
-  : null;
-
 const data = {
-  currentPanel: currentPanel,
-  recipeDetailId: recipeDetailId,
   userIsLoggedIn: false
 };
 cache.writeData({ data });
