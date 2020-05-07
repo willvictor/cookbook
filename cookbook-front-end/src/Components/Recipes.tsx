@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {Card, CardHeader, CardActions, CircularProgress, CardMedia} from '@material-ui/core';
-import { useQuery, useApolloClient} from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
 
@@ -35,11 +35,8 @@ query Recipes{
 `;
 
 const Recipes = () => {
-  let { path, url } = useRouteMatch();
-
   const classes = useStyles();
   const { loading, error, data } = useQuery(GET_RECIPES);
-  const client = useApolloClient();
   if(loading) return <CircularProgress/>;
   if(error) return <span>oh no, an error occured</span>;
 
