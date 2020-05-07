@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Card, CardHeader, CardActions, CircularProgress, CardMedia} from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import Error from './Error';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -37,8 +38,14 @@ query Recipes{
 const Recipes = () => {
   const classes = useStyles();
   const { loading, error, data } = useQuery(GET_RECIPES);
-  if(loading) return <CircularProgress/>;
-  if(error) return <span>oh no, an error occured</span>;
+  
+  if (loading) {
+      return <CircularProgress/>;
+  }
+
+  if (error) {
+    return <Error errorMessage={error.message} />;
+  }
 
   return <>
         <div className={classes.recipesRoot}>

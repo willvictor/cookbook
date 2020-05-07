@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, CircularProgress, CardMedia, Typography} from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import Error from './Error';
 import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -37,8 +38,14 @@ const RecipeDetail = () => {
 
     const classes = useStyles();
     const { loading, error, data } = useQuery(GET_RECIPES, {variables: {recipeDetailId: recipeDetailId}});
-    if(loading) return <CircularProgress/>;
-    if(error) return <span>Oh No! An Error Occurred: {error.message}</span>;
+    
+    if (loading) {
+      return <CircularProgress/>;
+    }
+
+    if (error) {
+      return <Error errorMessage={error.message} />;
+    }
     
     return   <Paper className={classes.root}>
         <Grid container spacing={3}>
