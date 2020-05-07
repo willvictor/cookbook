@@ -67,7 +67,7 @@ const CreateRecipe = () => {
                     <TextField 
                     variant="outlined" 
                     label="Recipe Name" 
-                    defaultValue="Recipe Name" 
+                    required
                     className={classes.name}
                     onChange={(e) => setName(e.target.value)}/>
                 </div>
@@ -75,27 +75,28 @@ const CreateRecipe = () => {
                     <TextField 
                     variant="outlined" 
                     label="Ingredients" 
-                    defaultValue="1 egg, 2 cups milk..." 
+                    required
+                    multiline
+                    rows={6}
                     className={classes.ingredients}
-                    multiline={true}
                     onChange={(e) => setIngredients(e.target.value)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
                     variant="outlined" 
                     label="Directions" 
-                    defaultValue="Combine Eggs and milk, then heat over medium flame..." 
+                    required
+                    multiline
+                    rows={6}
                     className={classes.directions}
-                    multiline={true}
                     onChange={(e) => setDirections(e.target.value)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
                     variant="outlined" 
                     label="Image Url" 
-                    defaultValue="Paste a url for an image hosted somewhere (like imgr)" 
+                    placeholder="Paste a url for an image hosted somewhere (like imgr)" 
                     className={classes.imageUrl}
-                    multiline={true}
                     onChange={(e) => setImageUrl(e.target.value)}/>
                 </div>
                 <Button 
