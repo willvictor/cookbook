@@ -5,6 +5,6 @@ export const getSequelizeInstance = () => new Sequelize({
   dialect: 'postgres',
   username: 'postgres',
   password: process.env.CLOUD_SQL_DB_PWD || '',
-  host: process.env.CLOUD_SQL_HOST || 'localhost:5432',
+  host: process.env.CLOUD_SQL_HOST || 'localhost',
   models: [__dirname + '/models']
 });
