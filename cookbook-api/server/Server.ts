@@ -22,4 +22,8 @@ app.use(
   })),
 );
 
-app.listen(2000);
+app.get("/hello", (req, res) => {
+  res.send("Hello world!");
+})
+
+app.listen(process.env.PORT || 2000);
