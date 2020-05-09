@@ -13,9 +13,7 @@ jobs:
             - run: chmod +x cloud_sql_proxy
             - run: touch ./gcloud_service_key && echo "${GCLOUD_SERVICE_KEY}" > ./gcloud_service_key
             - run: ./cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key &
-            - run: cd cookbook-api
-            - run: npm install
-            - run: npm run dbup
+            - run: cd cookbook-api && npm install && run dbup
           
 workflows:
     build-dbup-test:
