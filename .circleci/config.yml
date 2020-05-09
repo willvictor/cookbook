@@ -12,9 +12,7 @@ jobs:
             - run: wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
             - run: chmod +x cloud_sql_proxy
             - run: touch ./gcloud_service_key && echo "${GCLOUD_SERVICE_KEY}" > ./gcloud_service_key
-            - run: 
-              command: ./cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key
-              background: true
+            - run: ./cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key &
             - run: cd cookbook-api
             - run: npm install
             - run: npm run dbup
