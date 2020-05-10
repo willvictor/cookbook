@@ -1,8 +1,8 @@
 version: 2.1
 jobs:
   build-dbup-test:
-    executor:
-      name: node/default
+    docker:
+      - image: circleci/node:10.16.3
     steps:
       - checkout
       - run: wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
