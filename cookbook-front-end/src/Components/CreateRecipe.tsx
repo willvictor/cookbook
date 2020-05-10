@@ -40,10 +40,10 @@ const SUBMIT_RECIPE = gql`
 
 const CreateRecipe = () => {
     const classes = useStyles();
-    const [name, setName] = useState("Recipe Name");
-    const [ingredients, setIngredients] = useState("1 egg, 2 cups milk..." );
-    const [directions, setDirections] = useState("Combine Eggs and milk, then heat over medium flame...");
-    const [imageUrl, setImageUrl] = useState("Paste a url for an image hosted somewhere (like imgr)");
+    const [name, setName] = useState(null as any);
+    const [ingredients, setIngredients] = useState(null as any);
+    const [directions, setDirections] = useState(null as any);
+    const [imageUrl, setImageUrl] = useState(null as any);
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
@@ -56,6 +56,14 @@ const CreateRecipe = () => {
             }
         });
 
+    const isNameError = name === null || name === "";
+    const isIngredientsError = ingredients === null || ingredients === "";
+    const isDirectionsError = directions === null || directions === "";
+
+    const nameErrorText = isNameError ? "Recipe name can't be null" : null;
+    const ingredientsErrorText = isIngredientsError ? "Ingredients can't be null" : null;
+    const directionsErrorText = isDirectionsError ? "Directions can't be null" : null;
+
     return <Container maxWidth="lg">
         {   !loading 
             && !data 
@@ -65,6 +73,8 @@ const CreateRecipe = () => {
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
+                    error={isNameError} // Don't want initial state to be error though
+                    helperText={nameErrorText}
                     variant="outlined" 
                     label="Recipe Name" 
                     required
@@ -76,6 +86,8 @@ const CreateRecipe = () => {
                     variant="outlined" 
                     label="Ingredients" 
                     required
+                    error={isIngredientsError}
+                    helperText={ingredientsErrorText}
                     multiline
                     rows={6}
                     className={classes.ingredients}
@@ -86,6 +98,8 @@ const CreateRecipe = () => {
                     variant="outlined" 
                     label="Directions" 
                     required
+                    error={isDirectionsError}
+                    helperText={directionsErrorText}
                     multiline
                     rows={6}
                     className={classes.directions}
@@ -102,7 +116,9 @@ const CreateRecipe = () => {
                 <Button 
                     color="primary" 
                     variant="contained"
-                    onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
+                    disabled={isNameError || isIngredientsError || isDirectionsError}
+                    //onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
+                    onClick={() => onSubmitRecipe(name, directions, ingredients, imageUrl)}>
                     Create New Recipe 
                 </Button>
             </Paper>
@@ -112,3 +128,9 @@ const CreateRecipe = () => {
 }
 
 export default CreateRecipe;
+
+const onSubmitRecipe = (name: string, directions: string, ingredients: string, imageUrl: string) => {
+    if (name == null) {
+        console.log("Name cannot be null");
+    }
+}
