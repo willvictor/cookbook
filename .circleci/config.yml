@@ -1,30 +1,15 @@
 version: 2.1
-orbs:
-  node: circleci/node@1.1.6
 jobs:
   build-dbup-test:
     executor:
       name: node/default
     steps:
       - checkout
-      - run: 
-        name: download-cloud-sql-proxy
-        command: 'wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy'
-      - run: 
-        name: make-cloud-sql-proxy-executable
-        command: 'chmod +x cloud_sql_proxy'
-      - run: 
-        name: create-cloud-sql-proxy-service-key-file
-        command: 'touch ./gcloud_service_key && echo "${GCLOUD_SERVICE_KEY}" > ./gcloud_service_key'
-      - run: 
-        name: run-cloud-sql-proxy
-        command: './cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key &'
-      - run: 
-        name: npm-install-api
-        command: 'cd cookbook-api && npm install'
-      - run:
-        name: run-dbup-up
-        command: 'cd cookbook-api && npm run dbup'
+      - run: wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+      - run: chmod +x cloud_sql_proxy
+      - run: touch ./gcloud_service_key && echo "${GCLOUD_SERVICE_KEY}" > ./gcloud_service_key
+      - run: ./cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key &
+      - run: cd cookbook-api && npm install && npm run dbup
           
 workflows:
     build-dbup-test:
