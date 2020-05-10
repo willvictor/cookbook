@@ -44,6 +44,11 @@ const CreateRecipe = () => {
     const [ingredients, setIngredients] = useState(null as any);
     const [directions, setDirections] = useState(null as any);
     const [imageUrl, setImageUrl] = useState(null as any);
+
+    const [isNameError, setIsNameError] = useState(true);
+    const [isIngredientsError, setIsIngredientsError] = useState(true);
+    const [isDirectionsError, setIsDirectionsError] = useState(true);
+
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
@@ -55,10 +60,6 @@ const CreateRecipe = () => {
                 });
             }
         });
-
-    const isNameError = name === null || name === "";
-    const isIngredientsError = ingredients === null || ingredients === "";
-    const isDirectionsError = directions === null || directions === "";
 
     const nameErrorText = isNameError ? "Recipe name can't be null" : null;
     const ingredientsErrorText = isIngredientsError ? "Ingredients can't be null" : null;
@@ -79,7 +80,7 @@ const CreateRecipe = () => {
                     label="Recipe Name" 
                     required
                     className={classes.name}
-                    onChange={(e) => setName(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setName, setIsNameError)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -91,7 +92,7 @@ const CreateRecipe = () => {
                     multiline
                     rows={6}
                     className={classes.ingredients}
-                    onChange={(e) => setIngredients(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setIngredients, setIsIngredientsError)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -103,7 +104,7 @@ const CreateRecipe = () => {
                     multiline
                     rows={6}
                     className={classes.directions}
-                    onChange={(e) => setDirections(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setDirections, setIsDirectionsError)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -129,8 +130,26 @@ const CreateRecipe = () => {
 
 export default CreateRecipe;
 
+const onFieldChange = (field: string, updateFieldFunc: Function, updateErrorFunc: Function) => {
+    updateFieldFunc(field);
+
+    if (updateErrorFunc === null) {
+        return;
+    }
+
+    if (isInvalidField(field)) {
+        updateErrorFunc(true);
+    } else {
+        updateErrorFunc(false);
+    }
+};
+
 const onSubmitRecipe = (name: string, directions: string, ingredients: string, imageUrl: string) => {
-    if (name == null) {
+    if (isInvalidField(name)) {
         console.log("Name cannot be null");
     }
+}
+
+const isInvalidField = (field: string): boolean => {
+    return field === null || field === "";
 }
