@@ -20,5 +20,4 @@ workflows:
         - build-dbup-test:
           filters:
             branches:
-              only:
-                - master
+              only: master
