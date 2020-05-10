@@ -16,9 +16,9 @@ jobs:
           
 workflows:
     build-dbup-test:
-      filters:
-        branches:
-          only:
-            - master
       jobs:
         - build-dbup-test
+            filters:
+              branches:
+                only:
+                  - master
