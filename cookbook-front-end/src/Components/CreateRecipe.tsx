@@ -4,7 +4,6 @@ import {Container, Paper, TextField, CircularProgress, Button} from '@material-u
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
-
 const useStyles = makeStyles((theme) => ({
     paper: {
         paddingBottom: theme.spacing(2),
@@ -45,9 +44,10 @@ const CreateRecipe = () => {
     const [directions, setDirections] = useState(null as any);
     const [imageUrl, setImageUrl] = useState(null as any);
 
-    const [isNameError, setIsNameError] = useState(true);
-    const [isIngredientsError, setIsIngredientsError] = useState(true);
-    const [isDirectionsError, setIsDirectionsError] = useState(true);
+    const [isNameError, setIsNameError] = useState(false);
+    const [isIngredientsError, setIsIngredientsError] = useState(false);
+    const [isDirectionsError, setIsDirectionsError] = useState(false);
+    const [isAnyEditMade, setIsAnyEditMade] = useState(false);
 
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
@@ -80,7 +80,7 @@ const CreateRecipe = () => {
                     label="Recipe Name" 
                     required
                     className={classes.name}
-                    onChange={(e) => onFieldChange(e.target.value, setName, setIsNameError)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setName, setIsNameError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -92,7 +92,7 @@ const CreateRecipe = () => {
                     multiline
                     rows={6}
                     className={classes.ingredients}
-                    onChange={(e) => onFieldChange(e.target.value, setIngredients, setIsIngredientsError)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setIngredients, setIsIngredientsError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -104,7 +104,7 @@ const CreateRecipe = () => {
                     multiline
                     rows={6}
                     className={classes.directions}
-                    onChange={(e) => onFieldChange(e.target.value, setDirections, setIsDirectionsError)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setDirections, setIsDirectionsError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -117,9 +117,8 @@ const CreateRecipe = () => {
                 <Button 
                     color="primary" 
                     variant="contained"
-                    disabled={isNameError || isIngredientsError || isDirectionsError}
-                    //onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
-                    onClick={() => onSubmitRecipe(name, directions, ingredients, imageUrl)}>
+                    disabled={isNameError || isIngredientsError || isDirectionsError || !isAnyEditMade}
+                    onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
                     Create New Recipe 
                 </Button>
             </Paper>
@@ -130,8 +129,9 @@ const CreateRecipe = () => {
 
 export default CreateRecipe;
 
-const onFieldChange = (field: string, updateFieldFunc: Function, updateErrorFunc: Function) => {
+const onFieldChange = (field: string, updateFieldFunc: Function, updateErrorFunc: Function, setIsAnyEditMade: Function): void => {
     updateFieldFunc(field);
+    setIsAnyEditMade(true);
 
     if (updateErrorFunc === null) {
         return;
@@ -144,12 +144,6 @@ const onFieldChange = (field: string, updateFieldFunc: Function, updateErrorFunc
     }
 };
 
-const onSubmitRecipe = (name: string, directions: string, ingredients: string, imageUrl: string) => {
-    if (isInvalidField(name)) {
-        console.log("Name cannot be null");
-    }
-}
-
 const isInvalidField = (field: string): boolean => {
     return field === null || field === "";
-}
+};
