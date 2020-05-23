@@ -2,25 +2,25 @@ version: 2.1
 jobs:
   build-and-deploy:
     docker:
-        - image: google/cloud-sdk
+      - image: google/cloud-sdk
     steps:
-        - checkout
-        - run: |
-            echo $GCLOUD_SERVICE_KEY_DEPLOY | gcloud auth activate-service-account --key-file=-
-            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-        - run: 
-            name: build back end
-            command: cd cookbook-api && npm run tsc
-        - run: 
-            name: build front end
-            command: cd cookbook-front-end && npm run build && cp build ../cookbook-api/.built
-        - run: 
-            name: create app.yaml
-            command: cd cookbook-api && npm run app-yaml
-        - deploy:
-            name: deploy app
-            command: cd cookbook-api && gcloud app deploy
+      - checkout
+      - run: |
+          echo $GCLOUD_SERVICE_KEY_DEPLOY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+      - run: 
+          name: build back end
+          command: cd cookbook-api && npm run tsc
+      - run: 
+          name: build front end
+          command: cd cookbook-front-end && npm run build && cp build ../cookbook-api/.built
+      - run: 
+          name: create app.yaml
+          command: cd cookbook-api && npm run app-yaml
+      - deploy:
+          name: deploy app
+          command: cd cookbook-api && gcloud app deploy
 
           
 workflows:
