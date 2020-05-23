@@ -58,10 +58,10 @@ const App = () => {
   const {data : userIsLoggedInData, loading: userLoggedInLoading} = useQuery(GET_USER_LOGGED_IN);
   const {data : googleClientIdData, loading: googleClientIdLoading} = useQuery(GET_GOOGLE_CLIENT_ID);
 
-  const [login, { data : loginData, loading : loginLoading}] = useMutation(
+  const [login, { data : loginData}] = useMutation(
     LOGIN, 
     {
-      update: (cache, mutationResult) => {
+      update: (cache) => {
         cache.writeData({
             data: {
                 userIsLoggedIn: true
