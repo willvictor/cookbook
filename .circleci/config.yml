@@ -5,6 +5,9 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - node/install:
+          install-yarn: false
+          node-version: latest
       - run: |
           echo $GCLOUD_SERVICE_KEY_DEPLOY | gcloud auth activate-service-account --key-file=-
           gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
@@ -22,7 +25,8 @@ jobs:
           name: deploy app
           command: cd cookbook-api && gcloud app deploy
 
-          
+orbs:
+  node: circleci/node@2.1.1         
 workflows:
   version: 2
   build-and-deploy:
