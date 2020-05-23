@@ -106,3 +106,7 @@ dist
 .built
 
 cloud_sql_proxy
+
+.DS_Store
+
+cookbook-api/app.yaml

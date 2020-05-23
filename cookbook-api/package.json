@@ -5,8 +5,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "start": "tsc && node .built/server/Server.js",
-    "dev": "nodemon -e ts --exec \"npm run start\"",
+    "gcp-build": "tsc -p .",
+    "start": "node .built/server/Server.js",
+    "devstart": "tsc -p . && node .built/server/Server.js",
+    "dev": "nodemon -e ts --exec \"npm run devstart\"",
+    "app-yaml": "node ./CreateAppYaml.js",
     "dbup": "tsc && cp -R database/migrations/scripts .built/database/migrations && node .built/database/migrations/RunMigrations.js"
   },
   "author": "Will Victor and Chris Dieckhaus",

@@ -1,24 +1,34 @@
 version: 2.1
 jobs:
-  build-dbup-test:
+  build-and-deploy:
     docker:
-      - image: circleci/node:10.16.3
+      - image: google/cloud-sdk
     steps:
       - checkout
-      - run: wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
-      - run: chmod +x cloud_sql_proxy
-      - run: touch ./gcloud_service_key && echo "${GCLOUD_SERVICE_KEY}" > ./gcloud_service_key
+      - run: |
+          echo $GCLOUD_SERVICE_KEY_DEPLOY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
       - run: 
-          name: start proxy
-          command: ./cloud_sql_proxy -instances=cookbook-274401:us-east1:cookbook-sql=tcp:5432 -credential_file=./gcloud_service_key
-          background: true
-      - run: cd cookbook-api && npm install && npm run dbup
+          name: build back end
+          command: cd cookbook-api && npm run tsc
+      - run: 
+          name: build front end
+          command: cd cookbook-front-end && npm run build && cp build ../cookbook-api/.built
+       - run: 
+          name: create app.yaml
+          command: cd cookbook-api && npm run app-yaml
+      - deploy:
+          name: deploy app
+          command: cd cookbook-api && gcloud app deploy
+
           
 workflows:
   version: 2
-  build-dbup-test:
+  build-and-deploy:
     jobs:
-      - build-dbup-test:
+      - build-and-deploy:
           filters:
             branches:
               only: master
+

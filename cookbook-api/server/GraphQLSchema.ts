@@ -52,6 +52,10 @@ const createSchema = () => {
                 resolve: async (root, args) => {
                     return await Recipe.findAll();
                 }
+            },
+            googleClientId: {
+                type: GraphQLString,
+                resolve: () => process.env.GOOGLE_CLIENT_ID || "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com"
             }
         })
     });
@@ -85,10 +89,10 @@ const createSchema = () => {
                     googleTokenId: {type: GraphQLString},
                 },
                 resolve: async (root, args) => {
-                    const client = new OAuth2Client("984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com");
+                    const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID || "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com");
                     const ticket = await client.verifyIdToken({
                         idToken: args.googleTokenId,
-                        audience: "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com",
+                        audience: process.env.GOOGLE_CLIENT_ID || "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com",
                     });
                     const payload = ticket.getPayload();
                     if (!payload) throw "payload should not be null";
