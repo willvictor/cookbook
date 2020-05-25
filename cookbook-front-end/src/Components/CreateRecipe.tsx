@@ -61,9 +61,9 @@ const CreateRecipe = () => {
             }
         });
 
-    const nameErrorText = isNameError ? "Recipe name can't be null" : null;
-    const ingredientsErrorText = isIngredientsError ? "Ingredients can't be null" : null;
-    const directionsErrorText = isDirectionsError ? "Directions can't be null" : null;
+    const nameErrorText = isNameError ? "Recipe name is required" : null;
+    const ingredientsErrorText = isIngredientsError ? "Ingredients are required" : null;
+    const directionsErrorText = isDirectionsError ? "Directions are required" : null;
 
     return <Container maxWidth="lg">
         {   !loading 
