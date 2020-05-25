@@ -17,11 +17,17 @@ import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
 import {GoogleLogin} from 'react-google-login';
 
-const GET_STATE = gql`
+const GET_USER_LOGGED_IN = gql`
   {
-    userIsLoggedIn @client
+    userIsLoggedIn @client,
   }
 `;
+
+const GET_GOOGLE_CLIENT_ID = gql`
+  {
+    googleClientId
+  }
+`
 
 const LOGIN = gql`
     mutation Login($googleTokenId: String!){
@@ -49,12 +55,13 @@ const useStyles = makeStyles({
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data} = useQuery(GET_STATE);
+  const {data : userIsLoggedInData, loading: userLoggedInLoading} = useQuery(GET_USER_LOGGED_IN);
+  const {data : googleClientIdData, loading: googleClientIdLoading} = useQuery(GET_GOOGLE_CLIENT_ID);
 
-  const [login, { data : loginData, loading : loginLoading}] = useMutation(
+  const [login, { data : loginData}] = useMutation(
     LOGIN, 
     {
-      update: (cache, mutationResult) => {
+      update: (cache) => {
         cache.writeData({
             data: {
                 userIsLoggedIn: true
@@ -80,7 +87,8 @@ const App = () => {
           <Typography variant="h6" className={classes.title}>
             Cookbook
           </Typography>
-          {data.userIsLoggedIn
+          {!userLoggedInLoading
+            && userIsLoggedInData.userIsLoggedIn
             && 
             <IconButton 
               edge="start" 
@@ -91,7 +99,9 @@ const App = () => {
                 <AddIcon />
               </Link>
             </IconButton>}
-          {!data.userIsLoggedIn
+          { !googleClientIdLoading 
+          &&
+            !userIsLoggedInData.userIsLoggedIn
           && 
           <GoogleLogin
                 onSuccess={(googleUser: any) => login(
@@ -102,7 +112,7 @@ const App = () => {
                   })
                 }
                 onFailure={(response) => console.log("failed to login google user")}
-                clientId = "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com"
+                clientId = {googleClientIdData.googleClientId}
                 render={renderProps => (
                   <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit">Login</Button>
                 )}

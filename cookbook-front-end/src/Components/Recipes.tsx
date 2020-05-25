@@ -55,11 +55,14 @@ const Recipes = () => {
                   <CardActions>
                       <Link to={`recipes/${r.recipeId}`}>View recipe</Link>
                   </CardActions>
-                  <CardMedia
-                      className={classes.media}
-                      image={r.imageUrl}
-                      title={r.name}
-                  />
+                  {
+                      r.imageUrl 
+                      &&
+                      <CardMedia
+                        className={classes.media}
+                        image={r.imageUrl}
+                        title={r.name}/>
+                  }
               </Card>
           })}
         </div>
