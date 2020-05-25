@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "gcp-build": "tsc -p .",
+    "gcp-build": "npm run dbup",
     "start": "node .built/server/Server.js",
     "devstart": "tsc -p . && node .built/server/Server.js",
     "dev": "nodemon -e ts --exec \"npm run devstart\"",

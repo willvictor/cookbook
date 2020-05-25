@@ -1,20 +1,5 @@
 version: 2.1
 jobs:
-  dbup:
-    docker:
-      - image: google/cloud-sdk
-    steps:
-      - checkout
-      - node/install:
-          install-yarn: false
-          node-version: latest
-      - run: |
-          echo $GCLOUD_SERVICE_KEY_CIRCLE_CI | gcloud auth activate-service-account --key-file=-
-          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-      - run: 
-          name: build back end
-          command: cd cookbook-api && npm install && npm run dbup
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
@@ -46,13 +31,7 @@ workflows:
   version: 2
   build-and-deploy:
     jobs:
-      - dbup:
-          filters:
-            branches:
-              only: master
       - build-and-deploy:
-          requires:
-            - dbup
           filters:
             branches:
               only: master
