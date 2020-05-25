@@ -4,7 +4,6 @@ import {Container, Paper, TextField, CircularProgress, Button} from '@material-u
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 
-
 const useStyles = makeStyles((theme) => ({
     paper: {
         paddingBottom: theme.spacing(2),
@@ -40,10 +39,16 @@ const SUBMIT_RECIPE = gql`
 
 const CreateRecipe = () => {
     const classes = useStyles();
-    const [name, setName] = useState("Recipe Name");
-    const [ingredients, setIngredients] = useState("1 egg, 2 cups milk..." );
-    const [directions, setDirections] = useState("Combine Eggs and milk, then heat over medium flame...");
-    const [imageUrl, setImageUrl] = useState("Paste a url for an image hosted somewhere (like imgr)");
+    const [name, setName] = useState(null as any);
+    const [ingredients, setIngredients] = useState(null as any);
+    const [directions, setDirections] = useState(null as any);
+    const [imageUrl, setImageUrl] = useState(null as any);
+
+    const [isNameError, setIsNameError] = useState(false);
+    const [isIngredientsError, setIsIngredientsError] = useState(false);
+    const [isDirectionsError, setIsDirectionsError] = useState(false);
+    const [isAnyEditMade, setIsAnyEditMade] = useState(false);
+
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
@@ -56,6 +61,10 @@ const CreateRecipe = () => {
             }
         });
 
+    const nameErrorText = isNameError ? "Recipe name is required" : null;
+    const ingredientsErrorText = isIngredientsError ? "Ingredients are required" : null;
+    const directionsErrorText = isDirectionsError ? "Directions are required" : null;
+
     return <Container maxWidth="lg">
         {   !loading 
             && !data 
@@ -65,31 +74,37 @@ const CreateRecipe = () => {
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
+                    error={isNameError} // Don't want initial state to be error though
+                    helperText={nameErrorText}
                     variant="outlined" 
                     label="Recipe Name" 
                     required
                     className={classes.name}
-                    onChange={(e) => setName(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setName, setIsNameError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
                     variant="outlined" 
                     label="Ingredients" 
                     required
+                    error={isIngredientsError}
+                    helperText={ingredientsErrorText}
                     multiline
                     rows={6}
                     className={classes.ingredients}
-                    onChange={(e) => setIngredients(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setIngredients, setIsIngredientsError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
                     variant="outlined" 
                     label="Directions" 
                     required
+                    error={isDirectionsError}
+                    helperText={directionsErrorText}
                     multiline
                     rows={6}
                     className={classes.directions}
-                    onChange={(e) => setDirections(e.target.value)}/>
+                    onChange={(e) => onFieldChange(e.target.value, setDirections, setIsDirectionsError, setIsAnyEditMade)}/>
                 </div>
                 <div className={classes.inputField}>
                     <TextField 
@@ -102,6 +117,7 @@ const CreateRecipe = () => {
                 <Button 
                     color="primary" 
                     variant="contained"
+                    disabled={isNameError || isIngredientsError || isDirectionsError || !isAnyEditMade}
                     onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
                     Create New Recipe 
                 </Button>
@@ -112,3 +128,22 @@ const CreateRecipe = () => {
 }
 
 export default CreateRecipe;
+
+const onFieldChange = (field: string, updateFieldFunc: Function, updateErrorFunc: Function, setIsAnyEditMade: Function): void => {
+    updateFieldFunc(field);
+    setIsAnyEditMade(true);
+
+    if (updateErrorFunc === null) {
+        return;
+    }
+
+    if (isInvalidField(field)) {
+        updateErrorFunc(true);
+    } else {
+        updateErrorFunc(false);
+    }
+};
+
+const isInvalidField = (field: string): boolean => {
+    return field === null || field === "";
+};
