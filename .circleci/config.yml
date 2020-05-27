@@ -14,7 +14,7 @@ jobs:
           gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
       - run: 
           name: build back end
-          command: cd cookbook-api && npm install && npm run tsc
+          command: cd cookbook-api && npm install && npm run tsc && cp -R database/migrations/scripts .built/database/migrations
       - run: 
           name: build front end
           command: cd cookbook-front-end && npm install && npm run build && cp -r build ../cookbook-api/.built

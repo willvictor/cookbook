@@ -5,9 +5,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
-    "gcp-build": "npm run dbup",
-    "start": "node .built/server/Server.js",
-    "devstart": "tsc -p . && node .built/server/Server.js",
+    "start": "node .built/database/migrations/RunMigrations.js && node .built/server/Server.js",
+    "devstart": "tsc -p . && cp -R database/migrations/scripts .built/database/migrations && node .built/server/Server.js",
     "dev": "nodemon -e ts --exec \"npm run devstart\"",
     "app-yaml": "node ./CreateAppYaml.js",
     "dbup": "tsc && cp -R database/migrations/scripts .built/database/migrations && node .built/database/migrations/RunMigrations.js"
