@@ -5,6 +5,7 @@ import {Card, CardHeader, CardActions, CircularProgress, CardMedia, GridList, Gr
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Error from './Error';
+import OutdoorGrillIcon from '@material-ui/icons/OutdoorGrill';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -32,6 +33,14 @@ const useStyles = makeStyles((theme) => ({
     image: {
         width: "100%",
         maxHeight: "100%"
+    },
+    iconImage: {
+        width: 150,
+        height: 150,
+        color: theme.palette.grey[700]
+    },
+    imageWrapper: {
+        textAlign: "center"
     }
 }));
 
@@ -67,7 +76,13 @@ const Recipes = () => {
             {data.recipes.map((r: any) => (
                 <GridListTile cols={1} className={classes.tile}>
                     <Link to={`recipes/${r.recipeId}`} className={classes.cardLink} key={r.recipeId}>
-                        <img src={r.imageUrl} alt={r.name} className={classes.image}/>
+                        <div className={classes.imageWrapper}>
+                        {
+                            !!r.imageUrl
+                            ? <img src={r.imageUrl} alt={r.name} className={classes.image}/>
+                            : <OutdoorGrillIcon className={classes.iconImage}/>
+                        }
+                        </div>
                         <GridListTileBar
                             title={r.name}
                             subtitle={<span>by: {r.creator.firstName} {r.creator.lastName}</span>}/>
