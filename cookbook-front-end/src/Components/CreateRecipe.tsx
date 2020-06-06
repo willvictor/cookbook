@@ -4,6 +4,7 @@ import {Container, Paper, TextField, CircularProgress, Button} from '@material-u
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useHistory } from 'react-router';
+import { GET_RECIPES } from './Recipes';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -34,7 +35,9 @@ const useStyles = makeStyles((theme) => ({
 const SUBMIT_RECIPE = gql`
     mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!, $imageUrl: String){
         createRecipe(name:$name, directions:$directions, ingredients: $ingredients, imageUrl: $imageUrl){
-            recipeId
+            recipeId,
+            name,
+            imageUrl
         }
     }`; 
 
@@ -56,6 +59,11 @@ const CreateRecipe = () => {
         SUBMIT_RECIPE, 
         {
             update: (cache, mutationResult) => {
+                const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
+                cache.writeQuery({
+                    query: GET_RECIPES,
+                    data: { recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe]) },
+                });
                 history.push(`/recipes/${mutationResult.data.createRecipe.recipeId}`);
             }
         });

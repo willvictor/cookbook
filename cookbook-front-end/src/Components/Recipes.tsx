@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const GET_RECIPES = gql`
+export const GET_RECIPES = gql`
 query Recipes{
     recipes {
         recipeId,
