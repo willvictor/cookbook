@@ -3,6 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Container, Paper, TextField, CircularProgress, Button} from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
+import { useHistory } from 'react-router';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -49,15 +50,13 @@ const CreateRecipe = () => {
     const [isDirectionsError, setIsDirectionsError] = useState(false);
     const [isAnyEditMade, setIsAnyEditMade] = useState(false);
 
+    let history = useHistory();
+
     const [submitRecipe, {data, loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
             update: (cache, mutationResult) => {
-                cache.writeData({
-                    data: {
-                        recipeDetailId: mutationResult.data.createRecipe.recipeId
-                    }
-                });
+                history.push(`/recipes/${mutationResult.data.createRecipe.recipeId}`);
             }
         });
 
