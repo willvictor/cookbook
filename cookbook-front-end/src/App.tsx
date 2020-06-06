@@ -49,6 +49,10 @@ const useStyles = makeStyles({
   },
   addButton: {
 
+  },
+  routerLink: {
+    textDecoration: "none",
+    color: "inherit"
   }
 });
 
@@ -80,7 +84,7 @@ const App = () => {
             className={classes.menuButton} 
             color="inherit" 
             aria-label="home">
-            <Link to="/">
+            <Link to="/" className={classes.routerLink}>
               <HomeIcon />
             </Link>
           </IconButton>
@@ -95,7 +99,7 @@ const App = () => {
               className={classes.addButton} 
               color="inherit" 
               aria-label="add">
-              <Link to="/create">
+              <Link to="/create" className={classes.routerLink}> 
                 <AddIcon />
               </Link>
             </IconButton>}
