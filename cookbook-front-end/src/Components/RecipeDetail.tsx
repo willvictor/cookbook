@@ -5,16 +5,28 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Error from './Error';
 import { useParams } from 'react-router-dom';
+import { flexbox } from '@material-ui/system';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         marginTop: theme.spacing(2),
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
+        textAlign: "center"
     },
     media: {
-        height: 400,
-        width: 400,
-        borderRadius: 10
+        width: "100%",
+        height: 300
+    },
+    header: {
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column"
+    },
+    title: {
+        alignSelf: "flex-start"
+    },
+    subtitle: {
+        alignSelf: "flex-end"
     }
 }));
 const GET_RECIPES = gql`
@@ -49,31 +61,32 @@ const RecipeDetail = () => {
     
     return   <Paper className={classes.root}>
         <Grid container spacing={3}>
-            <Grid item xs={6}>
-                <Grid container spacing={3}>
-                    <Grid item>
-                        <Typography variant="h3">{data.recipe.name}</Typography>
-                        <Typography variant="subtitle1">Created by {data.recipe.creator.firstName} {data.recipe.creator.lastName}</Typography>
-                    </Grid>
-                    
-                    <Grid item>
-                        <Typography variant="h5">Ingredients</Typography>
-                        <Typography variant="body1">{data.recipe.ingredients}</Typography>
-                    </Grid>
-
-                    <Grid item>
-                        <Typography variant="h5">Directions</Typography>
-                        <Typography variant="body1">{data.recipe.directions}</Typography>
-                    </Grid>
-                </Grid>
-            </Grid>
-            <Grid item xs={6}>
-                <CardMedia
-                    className={classes.media}
+            <Grid item xs={12}>
+                {data.recipe.imageUrl
+                ? <CardMedia
                     image={data.recipe.imageUrl}
                     title={data.recipe.name}
-                />
+                    className={classes.media}/>
+                : ""}
             </Grid>
+            <Grid item xs={12} className={classes.header}>
+                    <Grid item>
+                        <Typography variant="h4" className={classes.title}>{data.recipe.name}</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="subtitle1" className={classes.subtitle}>Created by {data.recipe.creator.firstName} {data.recipe.creator.lastName}</Typography>
+                    </Grid>
+            </Grid>
+            <Grid item xs={6}>
+                <Typography variant="h5">Ingredients</Typography>
+                <Typography variant="body1">{data.recipe.ingredients}</Typography>
+            </Grid>
+
+            <Grid item xs={6}>
+                <Typography variant="h5">Directions</Typography>
+                <Typography variant="body1">{data.recipe.directions}</Typography>
+            </Grid>
+            
         </Grid>
     </Paper>;
 }
