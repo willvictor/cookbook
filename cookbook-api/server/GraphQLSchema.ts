@@ -50,7 +50,7 @@ const createSchema = () => {
             recipes: {
                 type: new GraphQLList(RecipeType),
                 resolve: async (root, args) => {
-                    return await Recipe.findAll();
+                    return await Recipe.findAll({include: [User]});
                 }
             },
             googleClientId: {
