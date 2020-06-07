@@ -17,14 +17,14 @@ import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
 import {GoogleLogin} from 'react-google-login';
 
-const GET_USER_LOGGED_IN = gql`
-  {
-    userIsLoggedIn @client,
-  }
-`;
 
-const GET_GOOGLE_CLIENT_ID = gql`
-  {
+const GET_SESSION_INFO = gql`
+  query SessionInfo {
+    sessionUser{
+      firstName,
+      lastName,
+      imageUrl
+    },
     googleClientId
   }
 `
@@ -59,24 +59,23 @@ const useStyles = makeStyles({
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data : userIsLoggedInData, loading: userLoggedInLoading} = useQuery(GET_USER_LOGGED_IN);
-  const {data : googleClientIdData, loading: googleClientIdLoading} = useQuery(GET_GOOGLE_CLIENT_ID);
+  const {data : sessionInfoData, loading: sessionInfoDataLoading} = useQuery(GET_SESSION_INFO);
 
   const [login, { data : loginData}] = useMutation(
     LOGIN, 
     {
-      update: (cache) => {
-        cache.writeData({
-            data: {
-                userIsLoggedIn: true
-            }
+      update: (cache, mutationResult) => {
+        const cacheContents = cache.readQuery({ query: GET_SESSION_INFO }) as any;
+        cache.writeQuery({
+          query: GET_SESSION_INFO,
+          data: { sessionUser: mutationResult.data.login, googleClientId: cacheContents.googleClientId },
         });
         setLoginToastOpen(true);
       }
     });
 
   return <Router>
-    <Container maxWidth="md">
+    <Container maxWidth="lg">
       <AppBar position="static" className={classes.root}>
         <Toolbar>
           <IconButton 
@@ -91,8 +90,8 @@ const App = () => {
           <Typography variant="h6" className={classes.title}>
             Cookbook
           </Typography>
-          {!userLoggedInLoading
-            && userIsLoggedInData.userIsLoggedIn
+          {!sessionInfoDataLoading
+            && !!sessionInfoData.sessionUser
             && 
             <IconButton 
               edge="start" 
@@ -105,9 +104,9 @@ const App = () => {
                 </Typography>
               </Link>
             </IconButton>}
-          { !googleClientIdLoading 
+          { !sessionInfoDataLoading 
           &&
-            !userIsLoggedInData.userIsLoggedIn
+            !sessionInfoData.sessionUser
           && 
           <GoogleLogin
                 onSuccess={(googleUser: any) => login(
@@ -118,7 +117,7 @@ const App = () => {
                   })
                 }
                 onFailure={(response) => console.log("failed to login google user")}
-                clientId = {googleClientIdData.googleClientId}
+                clientId = {sessionInfoData.googleClientId}
                 render={renderProps => (
                   <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit">
                     <Typography variant="button">
