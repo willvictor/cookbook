@@ -5,7 +5,6 @@ import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Error from './Error';
 import { useParams } from 'react-router-dom';
-import { flexbox } from '@material-ui/system';
 
 const useStyles = makeStyles((theme) => ({
     root: {

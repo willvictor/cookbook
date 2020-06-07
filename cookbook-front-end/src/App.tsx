@@ -9,7 +9,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Container, AppBar, Typography, Toolbar, IconButton, Button, Snackbar} from '@material-ui/core';
 import { Alert } from '@material-ui/lab';
 import HomeIcon from '@material-ui/icons/Home';
-import AddIcon from '@material-ui/icons/Add';
 import Recipes from './Components/Recipes';
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
