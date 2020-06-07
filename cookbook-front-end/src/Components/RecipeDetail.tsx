@@ -26,6 +26,9 @@ const useStyles = makeStyles((theme) => ({
     },
     subtitle: {
         alignSelf: "flex-end"
+    },
+    preformatted: {
+        whiteSpace: "pre-wrap"
     }
 }));
 const GET_RECIPES = gql`
@@ -78,12 +81,12 @@ const RecipeDetail = () => {
             </Grid>
             <Grid item xs={6}>
                 <Typography variant="h5">Ingredients</Typography>
-                <Typography variant="body1">{data.recipe.ingredients}</Typography>
+                <Typography variant="body1" className={classes.preformatted}>{data.recipe.ingredients}</Typography>
             </Grid>
 
             <Grid item xs={6}>
                 <Typography variant="h5">Directions</Typography>
-                <Typography variant="body1">{data.recipe.directions}</Typography>
+                <Typography variant="body1" className={classes.preformatted}>{data.recipe.directions}</Typography>
             </Grid>
             
         </Grid>
