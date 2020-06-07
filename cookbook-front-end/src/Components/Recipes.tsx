@@ -5,7 +5,6 @@ import {CircularProgress, Grid, Card, CardMedia, CardContent, Typography} from '
 import { useQuery } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import Error from './Error';
-import OutdoorGrillIcon from '@material-ui/icons/OutdoorGrill';
 
 
 const useStyles = makeStyles((theme) => ({
