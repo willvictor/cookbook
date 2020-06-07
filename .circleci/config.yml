@@ -24,7 +24,7 @@ jobs:
       - deploy:
           name: deploy app
           command: cd cookbook-api && gcloud app deploy
-
+          
 orbs:
   node: circleci/node@2.1.1         
 workflows:
