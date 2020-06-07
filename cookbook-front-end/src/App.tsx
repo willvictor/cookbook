@@ -99,8 +99,10 @@ const App = () => {
               className={classes.addButton} 
               color="inherit" 
               aria-label="add">
-              <Link to="/create" className={classes.routerLink}> 
-                <AddIcon />
+              <Link to="/create" className={classes.routerLink}>
+                <Typography variant="button">
+                  Add recipe
+                </Typography>
               </Link>
             </IconButton>}
           { !googleClientIdLoading 
@@ -118,7 +120,11 @@ const App = () => {
                 onFailure={(response) => console.log("failed to login google user")}
                 clientId = {googleClientIdData.googleClientId}
                 render={renderProps => (
-                  <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit">Login</Button>
+                  <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit">
+                    <Typography variant="button">
+                      Login
+                    </Typography>
+                    </Button>
                 )}
                 cookiePolicy={'single_host_origin'}/>
           }
