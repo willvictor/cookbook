@@ -30,15 +30,26 @@ const useStyles = makeStyles((theme) => ({
     },
     inputField: {
         marginBottom: theme.spacing(2)
+    },
+    alert: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2)
     }
 }));
 
 const SUBMIT_RECIPE = gql`
     mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!, $imageUrl: String){
         createRecipe(name:$name, directions:$directions, ingredients: $ingredients, imageUrl: $imageUrl){
-            recipeId,
-            name,
-            imageUrl
+            userWasAuthenticated,
+            createdRecipe{
+                recipeId,
+                name,
+                imageUrl,
+                creator {
+                    firstName,
+                    lastName
+                }
+            }
         }
     }`; 
 
@@ -66,10 +77,15 @@ const CreateRecipe = () => {
                     return;
                 }
                 const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
-                cache.writeQuery({
-                    query: GET_RECIPES,
-                    data: { recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe.createdRecipe]) },
-                });
+                if (cacheContents.recipes){
+                    cache.writeQuery({
+                        query: GET_RECIPES,
+                        data: { 
+                            ...cacheContents,
+                            recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe.createdRecipe]) 
+                        },
+                    });
+                }
                 history.push(`/recipes/${mutationResult.data.createRecipe.createdRecipe.recipeId}`);
             }
         });
@@ -80,7 +96,6 @@ const CreateRecipe = () => {
 
     return <Container maxWidth="lg">
         {   !loading 
-            && !data 
             && <Paper className={classes.paper}>
                 <div className={classes.header}>
                     <h1>Create a new recipe</h1>
@@ -135,7 +150,7 @@ const CreateRecipe = () => {
                     Create New Recipe 
                 </Button>
                 {
-                    isAuthError && <Alert severity={"error"}>Please login to create a recipe</Alert>
+                    isAuthError && <Alert className={classes.alert} severity={"error"}>Please login to create a recipe</Alert>
                 }
             </Paper>
         }

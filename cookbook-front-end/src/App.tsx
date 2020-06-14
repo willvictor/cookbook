@@ -67,7 +67,7 @@ const App = () => {
         const cacheContents = cache.readQuery({ query: GET_SESSION_INFO }) as any;
         cache.writeQuery({
           query: GET_SESSION_INFO,
-          data: { sessionUser: mutationResult.data.login, googleClientId: cacheContents.googleClientId },
+          data: { ...cacheContents, sessionUser: mutationResult.data.login, googleClientId: cacheContents.googleClientId },
         });
         setLoginToastOpen(true);
       }

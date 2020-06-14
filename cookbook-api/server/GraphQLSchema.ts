@@ -2,7 +2,8 @@ import { GraphQLObjectType,
     GraphQLSchema,
     GraphQLInt,
     GraphQLList,
-    GraphQLString } from 'graphql';
+    GraphQLString, 
+    GraphQLBoolean} from 'graphql';
 import {getSequelizeInstance} from '../database/SequelizeFactory';
 import { User } from '../database/models/User';
 import { Recipe } from '../database/models/Recipe';
@@ -73,7 +74,13 @@ const createSchema = () => {
         name: 'Mutation',
         fields: () => ({
             createRecipe: {
-                type: RecipeType,
+                type: new GraphQLObjectType({
+                    name: "CreateRecipeResult",
+                    fields: () => ({
+                        userWasAuthenticated: {type: GraphQLBoolean},
+                        createdRecipe: {type: RecipeType},
+                    })
+                }),
                 args: {
                     name: {type: GraphQLString},
                     ingredients: {type: GraphQLString},
@@ -82,6 +89,12 @@ const createSchema = () => {
                     creatorId: {type: GraphQLInt}
                 },
                 resolve: async (root, args) => {
+                    if (!root.session.isAuthenticated){
+                        return {
+                            userWasAuthenticated: false,
+                            createdRecipe: null
+                        }
+                    }
                     const newRecipe = Recipe.build({
                         name: args.name,
                         ingredients: args.ingredients,
@@ -89,7 +102,12 @@ const createSchema = () => {
                         imageUrl: args.imageUrl,
                         creatorId: root.session.userId
                     });
-                    return await newRecipe.save();
+                    const recipe = await newRecipe.save();
+                    const recipeWithUser = await Recipe.findByPk(recipe.recipeId, {include: [User]});
+                    return {
+                        userWasAuthenticated: true,
+                        createdRecipe: recipeWithUser
+                    };
                 }
             },
             login: {
