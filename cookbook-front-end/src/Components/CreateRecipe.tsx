@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useHistory } from 'react-router';
 import { GET_RECIPES } from './Recipes';
+import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -52,6 +53,7 @@ const CreateRecipe = () => {
     const [isIngredientsError, setIsIngredientsError] = useState(false);
     const [isDirectionsError, setIsDirectionsError] = useState(false);
     const [isAnyEditMade, setIsAnyEditMade] = useState(false);
+    const [isAuthError, setIsAuthError] = useState(false)
 
     let history = useHistory();
 
@@ -59,12 +61,16 @@ const CreateRecipe = () => {
         SUBMIT_RECIPE, 
         {
             update: (cache, mutationResult) => {
+                if (!mutationResult.data.createRecipe.userWasAuthenticated){
+                    setIsAuthError(true);
+                    return;
+                }
                 const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
                 cache.writeQuery({
                     query: GET_RECIPES,
-                    data: { recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe]) },
+                    data: { recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe.createdRecipe]) },
                 });
-                history.push(`/recipes/${mutationResult.data.createRecipe.recipeId}`);
+                history.push(`/recipes/${mutationResult.data.createRecipe.createdRecipe.recipeId}`);
             }
         });
 
@@ -128,6 +134,9 @@ const CreateRecipe = () => {
                     onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
                     Create New Recipe 
                 </Button>
+                {
+                    isAuthError && <Alert severity={"error"}>Please login to create a recipe</Alert>
+                }
             </Paper>
         }
         {loading && <CircularProgress/>}
