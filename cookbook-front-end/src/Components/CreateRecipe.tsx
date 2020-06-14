@@ -5,6 +5,7 @@ import { useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
 import { useHistory } from 'react-router';
 import { GET_RECIPES } from './Recipes';
+import { Alert } from '@material-ui/lab';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -29,15 +30,26 @@ const useStyles = makeStyles((theme) => ({
     },
     inputField: {
         marginBottom: theme.spacing(2)
+    },
+    alert: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2)
     }
 }));
 
 const SUBMIT_RECIPE = gql`
     mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!, $imageUrl: String){
         createRecipe(name:$name, directions:$directions, ingredients: $ingredients, imageUrl: $imageUrl){
-            recipeId,
-            name,
-            imageUrl
+            userWasAuthenticated,
+            createdRecipe{
+                recipeId,
+                name,
+                imageUrl,
+                creator {
+                    firstName,
+                    lastName
+                }
+            }
         }
     }`; 
 
@@ -52,6 +64,7 @@ const CreateRecipe = () => {
     const [isIngredientsError, setIsIngredientsError] = useState(false);
     const [isDirectionsError, setIsDirectionsError] = useState(false);
     const [isAnyEditMade, setIsAnyEditMade] = useState(false);
+    const [isAuthError, setIsAuthError] = useState(false)
 
     let history = useHistory();
 
@@ -59,12 +72,21 @@ const CreateRecipe = () => {
         SUBMIT_RECIPE, 
         {
             update: (cache, mutationResult) => {
+                if (!mutationResult.data.createRecipe.userWasAuthenticated){
+                    setIsAuthError(true);
+                    return;
+                }
                 const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
-                cache.writeQuery({
-                    query: GET_RECIPES,
-                    data: { recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe]) },
-                });
-                history.push(`/recipes/${mutationResult.data.createRecipe.recipeId}`);
+                if (cacheContents.recipes){
+                    cache.writeQuery({
+                        query: GET_RECIPES,
+                        data: { 
+                            ...cacheContents,
+                            recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe.createdRecipe]) 
+                        },
+                    });
+                }
+                history.push(`/recipes/${mutationResult.data.createRecipe.createdRecipe.recipeId}`);
             }
         });
 
@@ -74,7 +96,6 @@ const CreateRecipe = () => {
 
     return <Container maxWidth="lg">
         {   !loading 
-            && !data 
             && <Paper className={classes.paper}>
                 <div className={classes.header}>
                     <h1>Create a new recipe</h1>
@@ -128,6 +149,9 @@ const CreateRecipe = () => {
                     onClick={() => submitRecipe({variables: {name, directions, ingredients, imageUrl}})}> 
                     Create New Recipe 
                 </Button>
+                {
+                    isAuthError && <Alert className={classes.alert} severity={"error"}>Please login to create a recipe</Alert>
+                }
             </Paper>
         }
         {loading && <CircularProgress/>}
