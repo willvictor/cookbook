@@ -68,7 +68,7 @@ const CreateRecipe = () => {
 
     let history = useHistory();
 
-    const [submitRecipe, {data, loading}] = useMutation(
+    const [submitRecipe, {loading}] = useMutation(
         SUBMIT_RECIPE, 
         {
             update: (cache, mutationResult) => {

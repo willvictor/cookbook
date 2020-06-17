@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import {Grid, Paper, CircularProgress, CardMedia, Typography, IconButton, Snackbar} from '@material-ui/core';
-import { Alert } from '@material-ui/lab';
+import {Grid, Paper, CircularProgress, CardMedia, Typography, IconButton} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import gql from 'graphql-tag';
@@ -82,7 +81,7 @@ const RecipeDetail = () => {
         {
             update: (cache, mutationResult) => {
                 const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
-                if (cacheContents.recipes){
+                if (cacheContents){
                     cache.writeQuery({
                         query: GET_RECIPES,
                         data: { 
@@ -140,8 +139,10 @@ const RecipeDetail = () => {
                     <IconButton 
                         edge="start"
                         color="inherit" 
-                        aria-label="home">
-                        <DeleteIcon onClick={() => setDeleteConfirmationOpen(true)}/>
+                        aria-label="home"
+                        onClick={() => setDeleteConfirmationOpen(true)}
+                        >
+                        <DeleteIcon/>
                     </IconButton>
                 }
             </Grid>
