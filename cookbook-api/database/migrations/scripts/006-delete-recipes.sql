@@ -1,0 +1,5 @@
+ALTER TABLE public.recipes
+ADD COLUMN date_deleted TIMESTAMP NULL;
+
+ALTER TABLE public.users
+ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT FALSE;

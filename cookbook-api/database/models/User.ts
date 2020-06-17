@@ -58,4 +58,12 @@ export class User extends Model<User> {
         field: "date_created"
     })
     dateCreated: Date;
+
+    @Column({
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      field: "is_admin",
+      defaultValue: false
+    })
+    isAdmin: Date;
 }

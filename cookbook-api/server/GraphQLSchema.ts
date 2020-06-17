@@ -8,6 +8,7 @@ import {getSequelizeInstance} from '../database/SequelizeFactory';
 import { User } from '../database/models/User';
 import { Recipe } from '../database/models/Recipe';
 import {OAuth2Client} from 'google-auth-library';
+import {Op} from 'sequelize';
 
 const sequelize = getSequelizeInstance();
 
@@ -15,7 +16,7 @@ const createSchema = () => {
     const UserType = new GraphQLObjectType({
         name: 'User',
         fields: () => ({
-            
+            userId: {type: GraphQLInt},
             firstName: {type: GraphQLString},
             lastName: {type: GraphQLString},
             email: {type: GraphQLString},
@@ -51,7 +52,7 @@ const createSchema = () => {
             recipes: {
                 type: new GraphQLList(RecipeType),
                 resolve: async (root, args) => {
-                    return await Recipe.findAll({include: [User]});
+                    return await Recipe.findAll({include: [User], where: {dateDeleted: {[Op.is]: null}}});
                 }
             },
             googleClientId: {
@@ -136,6 +137,21 @@ const createSchema = () => {
                     root.session.isAuthenticated = true;
                     root.session.userId = user.userId;
                     return user;
+                }
+            },
+            deleteRecipe: {
+                type: GraphQLBoolean,
+                args: {
+                    recipeId: {type: GraphQLInt},
+                },
+                resolve: async (root, args) => {
+                    const recipe = await Recipe.findByPk(args.recipeId);
+                    if (!recipe || recipe.creatorId !== root.session.userId){
+                        return false;
+                    }
+                    recipe.dateDeleted = new Date();
+                    await recipe.save();
+                    return true;
                 }
             }
         })

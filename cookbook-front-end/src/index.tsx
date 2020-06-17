@@ -9,10 +9,12 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 const cache = new InMemoryCache();
 const client = new ApolloClient({
   uri: '/graphql',
-  cache: cache
+  cache: cache,
+  resolvers: {}
 });
 
 const data = {
+  deletedRecipeToastIsOpen: false
 };
 cache.writeData({ data });
 
