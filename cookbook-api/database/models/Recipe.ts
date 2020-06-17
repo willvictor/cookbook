@@ -67,7 +67,13 @@ export class Recipe extends Model<Recipe> {
         field: "date_updated"
     })
     dateUpdated: Date;
- 
+
+    @Column({ 
+        type: DataTypes.DATE, 
+        allowNull: true,
+        field: "date_deleted"
+    })
+    dateDeleted: Date;
 
     @BelongsTo(() => User)
     creator: User;

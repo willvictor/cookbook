@@ -20,11 +20,13 @@ import {GoogleLogin} from 'react-google-login';
 const GET_SESSION_INFO = gql`
   query SessionInfo {
     sessionUser{
+      userId,
       firstName,
       lastName,
       imageUrl
     },
-    googleClientId
+    googleClientId,
+    deletedRecipeToastIsOpen @client
   }
 `
 
@@ -58,7 +60,7 @@ const useStyles = makeStyles({
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data : sessionInfoData, loading: sessionInfoDataLoading} = useQuery(GET_SESSION_INFO);
+  const {data : sessionInfoData, loading: sessionInfoDataLoading, client} = useQuery(GET_SESSION_INFO);
 
   const [login, { data : loginData}] = useMutation(
     LOGIN, 
@@ -150,6 +152,19 @@ const App = () => {
           Welcome {loginData && loginData.login.firstName} {loginData && loginData.login.lastName}!
         </Alert>
       </Snackbar>
+
+      {
+        sessionInfoData 
+        && 
+        <Snackbar 
+          open={sessionInfoData.deletedRecipeToastIsOpen} 
+          autoHideDuration={3000} 
+          onClose={() => client.writeData({data: {deletedRecipeToastIsOpen: false}})}>
+            <Alert onClose={() => client.writeData({data: {deletedRecipeToastIsOpen: false}})} severity="success">
+                  Successfully deleted recipe
+            </Alert>
+        </Snackbar>
+      }
     </Container>
   </Router>;
 }

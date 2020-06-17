@@ -6,13 +6,33 @@ import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
-const cache = new InMemoryCache();
+interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache{
+  originalReadQuery: any;
+}
+
+let cache = new InMemoryCache() as InMemoryCacheWithNullSafeReadQuery;
+
+// TODO: Monkey-patching in a fix for an open issue suggesting that
+// `readQuery` should return null or undefined if the query is not yet in the
+// cache: https://github.com/apollographql/apollo-feature-requests/issues/
+// code copied from here: https://github.com/apollographql/apollo-feature-requests/issues/1#issuecomment-431842138
+cache.originalReadQuery = cache.readQuery;
+cache.readQuery = (...args) => {
+  try {
+    return cache.originalReadQuery(...args);
+  } catch (err) {
+    return undefined;
+  }
+};
+
 const client = new ApolloClient({
   uri: '/graphql',
-  cache: cache
+  cache: cache,
+  resolvers: {}
 });
 
 const data = {
+  deletedRecipeToastIsOpen: false
 };
 cache.writeData({ data });
 
