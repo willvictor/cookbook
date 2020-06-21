@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import {CircularProgress, Grid, Card, CardMedia, CardContent, Typography} from '@material-ui/core';
 import { useQuery } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import Error from './Error';
+import { GET_RECIPES } from '../GraphqlQueries/GetRecipesQuery';
+import { RecipesResult } from '../GraphqlQueryTypes/RecipesResultType';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -31,23 +32,11 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export const GET_RECIPES = gql`
-query Recipes{
-    recipes {
-        recipeId,
-        name,
-        imageUrl,
-        creator {
-            firstName,
-            lastName
-        }
-    }
-}
-`;
+
 
 const Recipes = () => {
   const classes = useStyles();
-  const { loading, error, data } = useQuery(GET_RECIPES);
+  const { loading, error, data } = useQuery<RecipesResult>(GET_RECIPES);
   
   if (loading) {
       return <CircularProgress/>;
@@ -57,9 +46,15 @@ const Recipes = () => {
     return <Error errorMessage={error.message} />;
   }
 
+  if (!data){
+    return <Error errorMessage={"unexpected error occurred"} />;
+  }
+
+  const recipes = data.recipes;
+  
   return <>
     <Grid container className={classes.root} spacing={2}>
-        {data.recipes.map((r: any) => (
+        {recipes.map((r: any) => (
             <Grid item xs={12} sm={4} key={r.recipeId}>
                 <Card className={classes.card}>
                     <Link to={`recipes/${r.recipeId}`} key={r.recipeId} className={classes.cardLink}>

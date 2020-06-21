@@ -1,5 +1,5 @@
 import {QueryTypes} from 'sequelize';
-import {getSequelizeInstance} from '../SequelizeFactory';
+import {initalizeSequelizeInstance} from '../SequelizeFactory';
 import * as path from 'path';
 import * as fs from 'fs';
 
@@ -12,7 +12,7 @@ interface ScriptName {
 
 const basename = path.basename(__filename);
 
-var sequelize = getSequelizeInstance();
+var sequelize = initalizeSequelizeInstance();
 const runDbUp = async () => {
 
     const hasScriptsHistoryTable = await sequelize.query<Exists>(

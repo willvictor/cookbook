@@ -11,33 +11,12 @@ import { Alert } from '@material-ui/lab';
 import HomeIcon from '@material-ui/icons/Home';
 import Recipes from './Components/Recipes';
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import RecipeDetail from './Components/RecipeDetail';
 import CreateRecipe from './Components/CreateRecipe';
 import {GoogleLogin} from 'react-google-login';
-
-
-const GET_SESSION_INFO = gql`
-  query SessionInfo {
-    sessionUser{
-      userId,
-      firstName,
-      lastName,
-      imageUrl
-    },
-    googleClientId,
-    deletedRecipeToastIsOpen @client
-  }
-`
-
-const LOGIN = gql`
-    mutation Login($googleTokenId: String!){
-        login(googleTokenId:$googleTokenId){
-            firstName,
-            lastName,
-            imageUrl
-        }
-    }`; 
+import {LOGIN} from './GraphqlQueries/LoginQuery';
+import {GET_APP_STATE} from './GraphqlQueries/AppStateQuery';
+import { AppState } from './GraphqlQueryTypes/AppStateType';
 
 const useStyles = makeStyles({
   root: {
@@ -60,18 +39,20 @@ const useStyles = makeStyles({
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
-  const {data : sessionInfoData, loading: sessionInfoDataLoading, client} = useQuery(GET_SESSION_INFO);
+  const {data : appState, client: apolloClient} = useQuery<AppState>(GET_APP_STATE);
 
   const [login, { data : loginData}] = useMutation(
     LOGIN, 
     {
       update: (cache, mutationResult) => {
-        const cacheContents = cache.readQuery({ query: GET_SESSION_INFO }) as any;
-        cache.writeQuery({
-          query: GET_SESSION_INFO,
-          data: { ...cacheContents, sessionUser: mutationResult.data.login, googleClientId: cacheContents.googleClientId },
-        });
-        setLoginToastOpen(true);
+        const appStateToUpdate = cache.readQuery<AppState>({ query: GET_APP_STATE });
+        if (appStateToUpdate !== null){
+          cache.writeQuery({
+            query: GET_APP_STATE,
+            data: { ...appStateToUpdate, sessionUser: mutationResult.data.login, googleClientId: appStateToUpdate.googleClientId },
+          });
+          setLoginToastOpen(true);
+        }
       }
     });
 
@@ -91,8 +72,8 @@ const App = () => {
           <Typography variant="h6" className={classes.title}>
             Cookbook
           </Typography>
-          {!sessionInfoDataLoading
-            && !!sessionInfoData.sessionUser
+          {!!appState
+            && !!appState.sessionUser
             && 
             <IconButton 
               edge="start" 
@@ -105,9 +86,9 @@ const App = () => {
                 </Typography>
               </Link>
             </IconButton>}
-          { !sessionInfoDataLoading 
+          { !!appState
           &&
-            !sessionInfoData.sessionUser
+            !appState.sessionUser
           && 
           <GoogleLogin
                 onSuccess={(googleUser: any) => login(
@@ -117,8 +98,8 @@ const App = () => {
                     }
                   })
                 }
-                onFailure={(response) => console.log("failed to login google user")}
-                clientId = {sessionInfoData.googleClientId}
+                onFailure={() => console.log("failed to login google user")}
+                clientId = {appState.googleClientId}
                 render={renderProps => (
                   <Button onClick={renderProps.onClick} disabled={renderProps.disabled} color="inherit">
                     <Typography variant="button">
@@ -154,13 +135,13 @@ const App = () => {
       </Snackbar>
 
       {
-        sessionInfoData 
+        appState 
         && 
         <Snackbar 
-          open={sessionInfoData.deletedRecipeToastIsOpen} 
+          open={appState.deletedRecipeToastIsOpen} 
           autoHideDuration={3000} 
-          onClose={() => client.writeData({data: {deletedRecipeToastIsOpen: false}})}>
-            <Alert onClose={() => client.writeData({data: {deletedRecipeToastIsOpen: false}})} severity="success">
+          onClose={() => apolloClient.writeData({data: {deletedRecipeToastIsOpen: false}})}>
+            <Alert onClose={() => apolloClient.writeData({data: {deletedRecipeToastIsOpen: false}})} severity="success">
                   Successfully deleted recipe
             </Alert>
         </Snackbar>

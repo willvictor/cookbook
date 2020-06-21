@@ -1,14 +1,15 @@
 import express from "express";
 import graphqlHTTP from "express-graphql";
-import {createSchema} from "./GraphQLSchema";
+import {createSchema} from "./GraphQL/GraphQLSchema";
 import session from "express-session";
 import * as path from 'path';
 const pgSession = require('connect-pg-simple')(session);
 import {Pool} from 'pg';
+import { initalizeSequelizeInstance } from "../database/SequelizeFactory";
 
 const app = express();
-
-const schema = createSchema()
+initalizeSequelizeInstance();
+const schema = createSchema();
 
 app.set('trust proxy', 1)
 

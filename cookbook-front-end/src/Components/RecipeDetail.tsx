@@ -3,15 +3,18 @@ import { makeStyles } from '@material-ui/core/styles';
 import {Grid, Paper, CircularProgress, CardMedia, Typography, IconButton} from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import Error from './Error';
 import { useParams } from 'react-router-dom';
 import { useHistory } from 'react-router';
-import {GET_RECIPES } from './Recipes';
+import { GET_RECIPES } from '../GraphqlQueries/GetRecipesQuery';
+import { DELETE_RECIPE } from '../GraphqlQueries/DeleteRecipeQuery';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import { RecipesResult } from '../GraphqlQueryTypes/RecipesResultType';
+import { GET_APP_STATE } from '../GraphqlQueries/AppStateQuery';
+import { AppState } from '../GraphqlQueryTypes/AppStateType';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -42,29 +45,9 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: "row-reverse"
     }
 }));
-const GET_RECIPE = gql`
-query Recipe($recipeDetailId: Int){
-    sessionUser{
-        userId
-    }
-    recipe(recipeId:$recipeDetailId) {
-        recipeId,
-        name,
-        ingredients,
-        directions,
-        imageUrl,
-        creator {
-            userId,
-            firstName,
-            lastName
-        }
-    }
-}`;
 
-const DELETE_RECIPE = gql`
-mutation DeleteRecipe($recipeDetailId: Int){
-    deleteRecipe(recipeId:$recipeDetailId)
-}`;
+
+
 
 const RecipeDetail = () => {
     let { recipeDetailId } = useParams();
@@ -73,20 +56,21 @@ const RecipeDetail = () => {
     const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
     const classes = useStyles();
-    const { loading, error, data , client} = useQuery(GET_RECIPE, {variables: {recipeDetailId: recipeDetailId}});
-    let history = useHistory();
+    const { loading: recipeLoading, error: recipeError, data: recipesData, client} = useQuery<RecipesResult>(GET_RECIPES, {variables: {recipeIds: [recipeDetailId]}});
+    const { loading: appStateLoading, error: appStateError, data: appState } = useQuery<AppState>(GET_APP_STATE);
+    const history = useHistory();
 
     const [deleteRecipe, {loading: deleteRecipeLoading}] = useMutation(
         DELETE_RECIPE, 
         {
-            update: (cache, mutationResult) => {
-                const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
-                if (cacheContents){
+            update: (cache) => {
+                const recipeResults = cache.readQuery<RecipesResult>({ query: GET_RECIPES });
+                if (recipeResults && recipeResults.recipes){
                     cache.writeQuery({
                         query: GET_RECIPES,
-                        data: { 
-                            ...cacheContents,
-                            recipes: cacheContents.recipes.filter((recipe: any) => recipe.recipeId !== recipeDetailId ) 
+                        data: {
+                            ...recipeResults,
+                            recipes: recipeResults.recipes.filter((recipe: any) => recipe.recipeId !== recipeDetailId ) 
                         },
                     });
                 }
@@ -95,46 +79,50 @@ const RecipeDetail = () => {
             }
         });
     
-    if (loading || deleteRecipeLoading) {
+    if (recipeLoading || deleteRecipeLoading || appStateLoading) {
       return <CircularProgress/>;
     }
 
-    if (error) {
-      return <Error errorMessage={error.message} />;
+    if (recipeError || appStateError) {
+        return <Error errorMessage={recipeError ? recipeError.message : "an unexpected error occurred" } />;
     }
-    
+    if (!recipesData || !appState){
+        return <Error errorMessage="an unexpected error occurred" />;
+    }
+
+    const recipe = recipesData.recipes[0];
     return   <Paper className={classes.root}>
         <Grid container spacing={3}>
             <Grid item xs={12}>
-                {data.recipe.imageUrl
+                {recipe.imageUrl
                 ? <CardMedia
-                    image={data.recipe.imageUrl}
-                    title={data.recipe.name}
+                    image={recipe.imageUrl}
+                    title={recipe.name}
                     className={classes.media}/>
                 : ""}
             </Grid>
             <Grid item xs={12} className={classes.header}>
                     <Grid item>
-                        <Typography variant="h4" className={classes.title}>{data.recipe.name}</Typography>
+                        <Typography variant="h4" className={classes.title}>{recipe.name}</Typography>
                     </Grid>
                     <Grid item>
-                        <Typography variant="subtitle1" className={classes.subtitle}>Created by {data.recipe.creator.firstName} {data.recipe.creator.lastName}</Typography>
+                        <Typography variant="subtitle1" className={classes.subtitle}>Created by {recipe.creator.firstName} {recipe.creator.lastName}</Typography>
                     </Grid>
             </Grid>
             <Grid item xs={6}>
                 <Typography variant="h5">Ingredients</Typography>
-                <Typography variant="body1" className={classes.preformatted}>{data.recipe.ingredients}</Typography>
+                <Typography variant="body1" className={classes.preformatted}>{recipe.ingredients}</Typography>
             </Grid>
 
             <Grid item xs={6}>
                 <Typography variant="h5">Directions</Typography>
-                <Typography variant="body1" className={classes.preformatted}>{data.recipe.directions}</Typography>
+                <Typography variant="body1" className={classes.preformatted}>{recipe.directions}</Typography>
             </Grid>
 
             <Grid item xs={12} className={classes.deleteIconWrapper}>
                 {
-                    data.sessionUser && 
-                    data.recipe.creator.userId === data.sessionUser.userId
+                    appState.sessionUser && 
+                    recipe.creator.userId === appState.sessionUser.userId
                     &&
                     <IconButton 
                         edge="start"

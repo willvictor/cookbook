@@ -2,10 +2,12 @@ import React, {useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import {Container, Paper, TextField, CircularProgress, Button} from '@material-ui/core';
 import { useMutation } from '@apollo/react-hooks';
-import gql from 'graphql-tag';
 import { useHistory } from 'react-router';
-import { GET_RECIPES } from './Recipes';
+import { CREATE_RECIPE } from '../GraphqlQueries/CreateRecipeQuery';
+import { GET_RECIPES } from '../GraphqlQueries/GetRecipesQuery';
 import { Alert } from '@material-ui/lab';
+import { CreateRecipeResult } from '../GraphqlQueryTypes/CreateRecipeResultType';
+import { Recipe } from '../GraphqlQueryTypes/RecipeType';
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -37,22 +39,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const SUBMIT_RECIPE = gql`
-    mutation CreateRecipe($name: String!, $directions: String!, $ingredients: String!, $imageUrl: String){
-        createRecipe(name:$name, directions:$directions, ingredients: $ingredients, imageUrl: $imageUrl){
-            userWasAuthenticated,
-            createdRecipe{
-                recipeId,
-                name,
-                imageUrl,
-                creator {
-                    firstName,
-                    lastName
-                }
-            }
-        }
-    }`; 
-
 const CreateRecipe = () => {
     const classes = useStyles();
     const [name, setName] = useState(null as any);
@@ -68,25 +54,27 @@ const CreateRecipe = () => {
 
     let history = useHistory();
 
-    const [submitRecipe, {loading}] = useMutation(
-        SUBMIT_RECIPE, 
+    const [submitRecipe, {loading}] = useMutation<CreateRecipeResult>(
+        CREATE_RECIPE, 
         {
-            update: (cache, mutationResult) => {
-                if (!mutationResult.data.createRecipe.userWasAuthenticated){
+            update: (cache, {data}) => {
+                if (!data){
+                    return;
+                }
+                if (!data.createRecipe.userWasAuthenticated){
                     setIsAuthError(true);
                     return;
                 }
-                const cacheContents = cache.readQuery({ query: GET_RECIPES }) as any;
-                if (cacheContents.recipes){
+                const recipes = cache.readQuery<Recipe[]>({ query: GET_RECIPES });
+                if (recipes){
                     cache.writeQuery({
                         query: GET_RECIPES,
-                        data: { 
-                            ...cacheContents,
-                            recipes: cacheContents.recipes.concat([mutationResult.data.createRecipe.createdRecipe]) 
+                        data: {
+                            recipes: recipes.concat([data.createRecipe.createdRecipe]) 
                         },
                     });
                 }
-                history.push(`/recipes/${mutationResult.data.createRecipe.createdRecipe.recipeId}`);
+                history.push(`/recipes/${data.createRecipe.createdRecipe.recipeId}`);
             }
         });
 
