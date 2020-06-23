@@ -1,6 +1,6 @@
 import express from "express";
-import graphqlHTTP from "express-graphql";
-import {createSchema} from "./GraphQL/GraphQLSchema";
+import {ApolloServer, gql} from "apollo-server-express";
+import {schema} from "./GraphQL/GraphQLSchema";
 import session from "express-session";
 import * as path from 'path';
 const pgSession = require('connect-pg-simple')(session);
@@ -9,7 +9,6 @@ import { initalizeSequelizeInstance } from "../database/SequelizeFactory";
 
 const app = express();
 initalizeSequelizeInstance();
-const schema = createSchema();
 
 app.set('trust proxy', 1)
 
@@ -29,14 +28,12 @@ app.use(session({
   }
 }));
 
-app.use(
-  '/graphql',
-  graphqlHTTP(request => ({
-    schema: schema,
-    rootValue: request,
-    graphiql: true,
-  })),
-);
+
+const server = new ApolloServer({
+  schema: schema,
+  context: async ({req}) => req
+});
+server.applyMiddleware({ app });
 
 //in production, this serves the create react app.
 app.use(express.static(path.join(__dirname, '../build')))

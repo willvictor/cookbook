@@ -1,15 +1,11 @@
-import { GraphQLObjectType,
-    GraphQLInt,
-    GraphQLString} from 'graphql';
+import {gql} from "apollo-server-express"
 
-export const UserType = new GraphQLObjectType({
-    name: 'User',
-    fields: () => ({
-        userId: {type: GraphQLInt},
-        firstName: {type: GraphQLString},
-        lastName: {type: GraphQLString},
-        email: {type: GraphQLString},
-        imageUrl: {type: GraphQLString},
-        googleSubId: {type: GraphQLString}
-    })
-});
+export const UserType = gql`
+    type User {
+        userId: Int,
+        firstName: String,
+        lastName: String,
+        email: String,
+        imageUrl: String,
+        googleSubId: String
+    }`;
