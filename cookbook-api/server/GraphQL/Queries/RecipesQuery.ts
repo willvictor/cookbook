@@ -10,13 +10,14 @@ export const recipes = {
     args: {
         recipeIds: {type: GraphQLList(GraphQLInt)},
     },
-    resolve: async (args : any) => {
+    resolve: async (root: any, args : any) => {
         let whereClause : any = !args.recipeIds 
             ? {} 
             : {recipeId : args.recipeIds};
         whereClause.dateDeleted = { 
             [Op.is]: null 
         };
+        console.log(args);
         return await Recipe.findAll({ 
             include: [User], 
             where: whereClause

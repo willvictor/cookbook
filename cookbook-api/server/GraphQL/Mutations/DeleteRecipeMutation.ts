@@ -1,21 +1,21 @@
-import { GraphQLBoolean, GraphQLInt } from "graphql";
+import { GraphQLInt, GraphQLEnumType } from "graphql";
 import { Recipe } from "../../../database/models/Recipe";
 
 enum deleteRecipeResult {
-    recipeIdNotValid = 1,
-    notLoggedIn = 2,
-    sessionUserIsNotCreator = 3,
-
+    successfullyDeleted = 1,
+    recipeIdNotValid = 2,
+    notLoggedIn = 3,
+    sessionUserIsNotCreator = 4,
 };
 
 export const deleteRecipe =  {
-    type: GraphQLBoolean,
+    type: GraphQLInt,
     args: {
         recipeId: {type: GraphQLInt},
     },
     resolve: async (root : any, args : any) => {
         const recipe = await Recipe.findByPk(args.recipeId);
-        if (!root.isAuthenticated){
+        if (!root.session.isAuthenticated){
             return deleteRecipeResult.notLoggedIn;
         }
         if (!recipe){
@@ -26,6 +26,6 @@ export const deleteRecipe =  {
         }
         recipe.dateDeleted = new Date();
         await recipe.save();
-        return true;
+        return deleteRecipeResult.successfullyDeleted;
     }
 }

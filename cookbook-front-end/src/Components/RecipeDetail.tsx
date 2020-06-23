@@ -46,8 +46,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-
-
+enum DeleteRecipeResult {
+    successfullyDeleted = 1,
+    recipeIdNotValid = 2,
+    notLoggedIn = 3,
+    sessionUserIsNotCreator = 4,
+};
 
 const RecipeDetail = () => {
     let { recipeDetailId } = useParams();
@@ -60,10 +64,13 @@ const RecipeDetail = () => {
     const { loading: appStateLoading, error: appStateError, data: appState } = useQuery<AppState>(GET_APP_STATE);
     const history = useHistory();
 
-    const [deleteRecipe, {loading: deleteRecipeLoading}] = useMutation(
+    const [deleteRecipe, {loading: deleteRecipeLoading}] = useMutation<DeleteRecipeResult>(
         DELETE_RECIPE, 
         {
-            update: (cache) => {
+            update: (cache, {data: deletedRecipeResult}) => {
+                if (deletedRecipeResult !== DeleteRecipeResult.successfullyDeleted ){
+                    console.log("Did not successfully delete recipe");
+                }
                 const recipeResults = cache.readQuery<RecipesResult>({ query: GET_RECIPES });
                 if (recipeResults && recipeResults.recipes){
                     cache.writeQuery({
