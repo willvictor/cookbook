@@ -17,7 +17,6 @@ export const recipes = {
         whereClause.dateDeleted = { 
             [Op.is]: null 
         };
-        console.log(args);
         return await Recipe.findAll({ 
             include: [User], 
             where: whereClause
