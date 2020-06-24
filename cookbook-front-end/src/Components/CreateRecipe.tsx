@@ -61,7 +61,7 @@ const CreateRecipe = () => {
                 if (!data){
                     return;
                 }
-                if (!data.createRecipe.userWasAuthenticated){
+                if (!data.createRecipe){
                     setIsAuthError(true);
                     return;
                 }
@@ -70,11 +70,11 @@ const CreateRecipe = () => {
                     cache.writeQuery({
                         query: GET_RECIPES,
                         data: {
-                            recipes: recipes.concat([data.createRecipe.createdRecipe]) 
+                            recipes: recipes.concat([data.createRecipe]) 
                         },
                     });
                 }
-                history.push(`/recipes/${data.createRecipe.createdRecipe.recipeId}`);
+                history.push(`/recipes/${data.createRecipe.recipeId}`);
             }
         });
 

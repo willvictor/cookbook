@@ -3,10 +3,7 @@ import { User } from "../../../database/models/User";
 
 export const CreateRecipeResolver =  async (parent: any, args : any, context: any) => {
     if (!context.session.isAuthenticated){
-        return {
-            userWasAuthenticated: false,
-            createdRecipe: null
-        }
+        return null;
     }
     const newRecipe = Recipe.build({
         name: args.name,
@@ -17,8 +14,5 @@ export const CreateRecipeResolver =  async (parent: any, args : any, context: an
     });
     const recipe = await newRecipe.save();
     const recipeWithUser = await Recipe.findByPk(recipe.recipeId, {include: [User]});
-    return {
-        userWasAuthenticated: true,
-        createdRecipe: recipeWithUser
-    };
+    return recipeWithUser;
 }
