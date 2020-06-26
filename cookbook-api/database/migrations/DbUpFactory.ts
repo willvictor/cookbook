@@ -2,6 +2,7 @@ import {QueryTypes} from 'sequelize';
 import {initalizeSequelizeInstance} from '../SequelizeFactory';
 import * as path from 'path';
 import * as fs from 'fs';
+import { Sequelize } from 'sequelize-typescript';
 
 interface Exists{
     exists: boolean;
@@ -12,8 +13,7 @@ interface ScriptName {
 
 const basename = path.basename(__filename);
 
-var sequelize = initalizeSequelizeInstance();
-const runDbUp = async () => {
+export const runDbUp = async (sequelize: Sequelize) => {
 
     const hasScriptsHistoryTable = await sequelize.query<Exists>(
         `SELECT EXISTS 
@@ -47,17 +47,12 @@ const runDbUp = async () => {
         });
     filesToExecute.sort(); //make sure we run the scripts in order!
     
-    filesToExecute
-        .forEach(file => {
-            const scriptFilePath = path.join(scriptsDir, file);
-            fs.readFile(scriptFilePath, 'utf8', (err, data) => {
-                (async () => {
-                    await sequelize.query(data);
-                    await sequelize.query(`
-                        INSERT INTO public.script_history (script_name, date_run)
-                        VALUES ('${file}', CURRENT_TIMESTAMP)`);
-                })()
-            });
-        });
+    for (let file of filesToExecute){
+        const scriptFilePath = path.join(scriptsDir, file);
+        const fileString = fs.readFileSync(scriptFilePath, 'utf8');
+        await sequelize.query(fileString);
+        await sequelize.query(`
+            INSERT INTO public.script_history (script_name, date_run)
+            VALUES ('${file}', CURRENT_TIMESTAMP)`);
+    }
 };
-runDbUp();

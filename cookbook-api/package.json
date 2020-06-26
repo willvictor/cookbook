@@ -3,19 +3,20 @@
   "version": "1.0.0",
   "description": "the typescript express web application to serve an api for the cookbook website",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "tsc": "tsc",
     "start": "node .built/database/migrations/RunMigrations.js && node .built/server/Server.js",
     "devstart": "tsc -p . && cp -R database/migrations/scripts .built/database/migrations && node .built/server/Server.js",
     "dev": "nodemon -e ts --exec \"npm run devstart\"",
     "app-yaml": "node ./CreateAppYaml.js",
-    "dbup": "tsc && cp -R database/migrations/scripts .built/database/migrations && node .built/database/migrations/RunMigrations.js"
+    "dbup": "tsc && cp -R database/migrations/scripts .built/database/migrations && node .built/database/migrations/DbUpRunner.js"
   },
   "author": "Will Victor and Chris Dieckhaus",
   "license": "ISC",
   "dependencies": {
     "@types/bluebird": "^3.5.30",
     "@types/express": "^4.17.6",
+    "@types/jest": "^26.0.3",
     "@types/node": "^13.11.1",
     "@types/pg": "^7.14.3",
     "@types/sequelize": "^4.28.8",
@@ -28,6 +29,7 @@
     "graphql": "^14.6.0",
     "graphql-relay": "^0.6.0",
     "graphql-tools": "^6.0.10",
+    "jest": "^26.1.0",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "reflect-metadata": "^0.1.13",
@@ -39,6 +41,7 @@
     "@types/connect-pg-simple": "^4.2.0",
     "@types/express-session": "^1.17.0",
     "@types/graphql": "^14.5.0",
-    "nodemon": "^2.0.3"
+    "nodemon": "^2.0.3",
+    "ts-jest": "^26.1.1"
   }
 }
