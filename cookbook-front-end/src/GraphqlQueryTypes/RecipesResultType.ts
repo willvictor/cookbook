@@ -1,5 +1,5 @@
-import {Recipe} from './RecipeType';
+import { Recipe } from "./RecipeType";
 
 export interface RecipesResult {
-    recipes: Recipe[];
+  recipes: Recipe[];
 }

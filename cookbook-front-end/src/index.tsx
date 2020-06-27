@@ -1,12 +1,12 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
-import ApolloClient from 'apollo-boost';
-import { ApolloProvider } from '@apollo/react-hooks';
-import { InMemoryCache } from 'apollo-cache-inmemory';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "@apollo/react-hooks";
+import { InMemoryCache } from "apollo-cache-inmemory";
 
-interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache{
+interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache {
   originalReadQuery: any;
 }
 
@@ -26,7 +26,7 @@ cache.readQuery = (...args) => {
 };
 
 const client = new ApolloClient({
-  uri: '/graphql',
+  uri: "/graphql",
   cache: cache,
   resolvers: {}
 });
@@ -38,9 +38,9 @@ cache.writeData({ data });
 
 ReactDOM.render(
   <ApolloProvider client={client}>
-    <App/>
+    <App />
   </ApolloProvider>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
 // If you want your app to work offline and load faster, you can change
