@@ -61,8 +61,8 @@ enum DeleteRecipeResult {
 }
 
 const RecipeDetail = () => {
-  let { recipeDetailId } = useParams();
-  recipeDetailId = parseInt(recipeDetailId);
+  let { recipeId } = useParams();
+  recipeId = parseInt(recipeId);
 
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
 
@@ -73,7 +73,7 @@ const RecipeDetail = () => {
     data: recipesData,
     client
   } = useQuery<RecipesResult>(GET_RECIPES, {
-    variables: { recipeIds: [recipeDetailId] }
+    variables: { recipeIds: [recipeId] }
   });
   const {
     loading: appStateLoading,
@@ -98,7 +98,7 @@ const RecipeDetail = () => {
           data: {
             ...recipeResults,
             recipes: recipeResults.recipes.filter(
-              (recipe: any) => recipe.recipeId !== recipeDetailId
+              (recipe: any) => recipe.recipeId !== recipeId
             )
           }
         });
@@ -200,7 +200,7 @@ const RecipeDetail = () => {
           <Button
             onClick={() => {
               setDeleteConfirmationOpen(false);
-              deleteRecipe({ variables: { recipeDetailId: recipeDetailId } });
+              deleteRecipe({ variables: { recipeId: recipeId } });
             }}
             color="primary"
             autoFocus

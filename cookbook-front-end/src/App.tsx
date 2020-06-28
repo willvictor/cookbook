@@ -125,7 +125,7 @@ const App = () => {
           <Route exact path="/">
             <Recipes />
           </Route>
-          <Route path="/recipes/:recipeDetailId">
+          <Route path="/recipes/:recipeId">
             <RecipeDetail />
           </Route>
           {/* #20 Need to AUTH protect this endpoint */}
