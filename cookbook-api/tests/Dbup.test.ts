@@ -1,47 +1,62 @@
-import { Sequelize } from "sequelize-typescript";
 import "jest";
 import {
   SetupTestDatabase,
   TearDownTestDatabase,
-  RunDbUpOnTestDb
+  RunDbUpOnTestDb,
+  GetTestSequelize
 } from "./TestUtilties";
+import { Sequelize } from "sequelize";
 
-beforeEach(async () => {
+let testSequelize: Sequelize;
+beforeAll(async () => {
   await SetupTestDatabase();
 });
 
-afterEach(async () => {
+afterAll(async () => {
   await TearDownTestDatabase();
 });
 
-test("Db up runs successfully", async () => {
-  //Run DBUP on the DB
-  RunDbUpOnTestDb();
-
+beforeEach(() => {
   //confirm a few things about the tables on the DB
-  const testSequelize = new Sequelize({
-    database: "cookbooktest",
-    dialect: "postgres",
-    username: "postgres",
-    password: process.env.TEST_DB_PWD || "",
-    host: "localhost"
+  testSequelize = GetTestSequelize();
+});
+
+afterEach(() => {
+  if (testSequelize) {
+    testSequelize.close();
+  }
+});
+
+describe("DbUp", async () => {
+  test("Db up runs successfully", async () => {
+    //Run DBUP on the DB
+    await RunDbUpOnTestDb();
   });
 
-  //recipes exists
-  let [data] = (await testSequelize.query(`
-    SELECT EXISTS (
-    SELECT FROM information_schema.tables 
-    WHERE  table_schema = 'public'
-    AND    table_name   = 'recipes')`)) as any;
-  expect(data[0].exists).toBe(true);
+  test("Has recipes table", async () => {
+    let [data] = (await testSequelize.query(`
+      SELECT EXISTS (
+      SELECT FROM information_schema.tables 
+      WHERE  table_schema = 'public'
+      AND    table_name   = 'recipes')`)) as any;
+    expect(data[0].exists).toBe(true);
+  });
 
-  //users exists
-  [data] = (await testSequelize.query(`
+  test("Has users table", async () => {
+    let [data] = (await testSequelize.query(`
     SELECT EXISTS (
     SELECT FROM information_schema.tables 
     WHERE  table_schema = 'public'
     AND    table_name   = 'users')`)) as any;
-  expect(data[0].exists).toBe(true);
+    expect(data[0].exists).toBe(true);
+  });
 
-  await testSequelize.close();
+  test("Has ratings table", async () => {
+    let [data] = (await testSequelize.query(`
+    SELECT EXISTS (
+    SELECT FROM information_schema.tables 
+    WHERE  table_schema = 'public'
+    AND    table_name   = 'recipe_ratings')`)) as any;
+    expect(data[0].exists).toBe(true);
+  });
 });

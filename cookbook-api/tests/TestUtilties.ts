@@ -39,3 +39,13 @@ export const TearDownTestDatabase = async () => {
   await dropDbSequelize.query("DROP DATABASE cookbooktest");
   await dropDbSequelize.close();
 };
+
+export const GetTestSequelize = () =>
+  new Sequelize({
+    database: "cookbooktest",
+    dialect: "postgres",
+    username: "postgres",
+    password: process.env.TEST_DB_PWD || "",
+    host: "localhost",
+    models: [__dirname + "/../database/models"]
+  });
