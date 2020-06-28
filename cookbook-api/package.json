@@ -4,6 +4,7 @@
   "description": "the typescript express web application to serve an api for the cookbook website",
   "scripts": {
     "test": "jest",
+    "ci-test": "jest --ci --runInBand --reporters=default --reporters=jest-junit",
     "tsc": "tsc",
     "start": "node .built/database/migrations/RunMigrations.js && node .built/server/Server.js",
     "devstart": "tsc -p . && cp -R database/migrations/scripts .built/database/migrations && node .built/server/Server.js",
