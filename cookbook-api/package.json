@@ -33,6 +33,7 @@
     "graphql-tools": "^6.0.10",
     "jest": "^26.1.0",
     "jest-cli": "^26.1.0",
+    "jest-junit": "^11.0.1",
     "pg": "^8.2.1",
     "pg-hstore": "^2.3.3",
     "reflect-metadata": "^0.1.13",
