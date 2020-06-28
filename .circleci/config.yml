@@ -5,6 +5,9 @@ jobs:
       - image: circleci/postgres:12.1
     steps:
       - checkout
+      - run:
+          name: install curl
+          command: apt-get update && apt-get install curl
       - node/install:
           install-yarn: false
           node-version: latest
