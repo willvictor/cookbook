@@ -13,7 +13,7 @@ import { CREATE_RECIPE } from "../GraphqlQueries/CreateRecipeQuery";
 import { GET_RECIPES } from "../GraphqlQueries/GetRecipesQuery";
 import { Alert } from "@material-ui/lab";
 import { CreateRecipeResult } from "../GraphqlQueryTypes/CreateRecipeResultType";
-import { Recipe } from "../GraphqlQueryTypes/RecipeType";
+import { RecipesResult } from "../GraphqlQueryTypes/RecipesResultType";
 
 const useStyles = makeStyles(theme => ({
   paper: {
@@ -71,12 +71,14 @@ const CreateRecipe = () => {
           setIsAuthError(true);
           return;
         }
-        const recipes = cache.readQuery<Recipe[]>({ query: GET_RECIPES });
-        if (recipes) {
+        const recipesResult = cache.readQuery<RecipesResult>({
+          query: GET_RECIPES
+        });
+        if (recipesResult) {
           cache.writeQuery({
             query: GET_RECIPES,
             data: {
-              recipes: recipes.concat([data.createRecipe])
+              recipes: recipesResult.recipes.concat([data.createRecipe])
             }
           });
         }
