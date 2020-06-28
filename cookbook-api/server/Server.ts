@@ -25,7 +25,13 @@ app.use(
     name: "cookbook.sid",
     secret: process.env.SESSION_SECRET || "local-host-dummy-secret",
     cookie: {
-      maxAge: 4.32e5 /* 5 days */
+      /*the amount of time the session will last without renewal in milliseconds*/
+      maxAge:
+        5 /* 5 days */ *
+        24 /*hours*/ *
+        60 /*mins*/ *
+        60 /*seconds*/ *
+        1000 /*milliseconds*/
     }
   })
 );
