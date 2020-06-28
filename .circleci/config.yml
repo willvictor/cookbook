@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: Run tests with JUnit as reporter
-          command: cd cookbook-api && npm install && jest --ci --runInBand --reporters=default --reporters=jest-junit
+          command: cd cookbook-api && npm install && ./node_modules/bin/jest --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
       - store_test_results:
