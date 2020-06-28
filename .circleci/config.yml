@@ -2,15 +2,10 @@ version: 2.1
 jobs:
   test:
     docker:
+      - image: circleci/node:10
       - image: circleci/postgres:12.1
     steps:
       - checkout
-      - run:
-          name: install curl
-          command: sudo apt-get update && sudo apt-get install curl
-      - node/install:
-          install-yarn: false
-          node-version: latest
       - run:
           name: test back end
           command: cd cookbook-api && npm install && npm t
