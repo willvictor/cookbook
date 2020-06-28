@@ -5,7 +5,6 @@ export const SessionUserResolver = async (
   args: any,
   context: any
 ) => {
-  console.log(context);
   if (
     !context.session ||
     !context.session.isAuthenticated ||

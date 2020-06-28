@@ -14,7 +14,6 @@ export const DeleteRecipeResolver = async (
   context: any
 ) => {
   const recipe = await Recipe.findByPk(args.recipeId, { include: [User] });
-  console.log(recipe);
   if (!context.session.isAuthenticated) {
     return deleteRecipeResult.notLoggedIn;
   }

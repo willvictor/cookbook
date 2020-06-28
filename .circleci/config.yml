@@ -7,8 +7,14 @@ jobs:
     steps:
       - checkout
       - run:
-          name: test back end
-          command: cd cookbook-api && npm install && npm t
+          name: Run tests with JUnit as reporter
+          command: cd cookbook-api && npm install && jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+      - store_test_results:
+          path: ./reports/junit/
+      - store_artifacts:
+          path: ./reports/junit
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
@@ -42,6 +48,8 @@ workflows:
     jobs:
       - test
       - build-and-deploy:
+          requires:
+            - test
           filters:
             branches:
               only: master

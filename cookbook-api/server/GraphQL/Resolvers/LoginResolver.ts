@@ -9,9 +9,7 @@ export const LoginResolver = async (parent: any, args: any, context: any) => {
       process.env.GOOGLE_CLIENT_ID ||
       "984941479252-maabsnngi084tun89leu7ts4otp1jldo.apps.googleusercontent.com"
   });
-  console.log(ticket);
   const payload = ticket.getPayload();
-  console.log(payload);
   if (!payload) throw "payload should not be null";
   const [user] = await User.findOrCreate({
     where: { googleSubId: payload["sub"] },
