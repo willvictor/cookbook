@@ -12,9 +12,9 @@ jobs:
           environment:
             JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
       - store_test_results:
-          path: ./reports/junit/
+          path: ./cookbook-api/reports/junit/
       - store_artifacts:
-          path: ./reports/junit
+          path: ./cookbook-api/reports/junit
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
