@@ -7,7 +7,7 @@ jobs:
       - checkout
       - run:
           name: install curl
-          command: apt-get update && apt-get install curl
+          command: sudo apt-get update && sudo apt-get install curl
       - node/install:
           install-yarn: false
           node-version: latest
