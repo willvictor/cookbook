@@ -1,5 +1,20 @@
 version: 2.1
 jobs:
+  test:
+    docker:
+      - image: circleci/node:10
+      - image: circleci/postgres:12.1
+    steps:
+      - checkout
+      - run:
+          name: Run tests with JUnit as reporter
+          command: cd cookbook-api && npm install && npm run ci-test
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+      - store_test_results:
+          path: ./cookbook-api/reports/junit/
+      - store_artifacts:
+          path: ./cookbook-api/reports/junit
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
@@ -12,27 +27,29 @@ jobs:
           echo $GCLOUD_SERVICE_KEY_DEPLOY | gcloud auth activate-service-account --key-file=-
           gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
           gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-      - run: 
+      - run:
           name: build back end
           command: cd cookbook-api && npm install && npm run tsc && cp -R database/migrations/scripts .built/database/migrations
-      - run: 
+      - run:
           name: build front end
           command: cd cookbook-front-end && npm install && npm run build && cp -r build ../cookbook-api/.built
-      - run: 
+      - run:
           name: create app.yaml
           command: cd cookbook-api && npm run app-yaml
       - deploy:
           name: deploy app
           command: cd cookbook-api && gcloud app deploy
-          
+
 orbs:
-  node: circleci/node@2.1.1         
+  node: circleci/node@2.1.1
 workflows:
   version: 2
-  build-and-deploy:
+  build-test-deploy:
     jobs:
+      - test
       - build-and-deploy:
+          requires:
+            - test
           filters:
             branches:
               only: master
-
