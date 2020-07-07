@@ -173,6 +173,7 @@ const RecipeDetail = () => {
                 edge="start"
                 color="inherit"
                 aria-label="home"
+                data-test-id="delete-recipe-button"
                 onClick={() => setDeleteConfirmationOpen(true)}
               >
                 <DeleteIcon />

@@ -6,7 +6,7 @@ import ApolloClient from "apollo-boost";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { InMemoryCache } from "apollo-cache-inmemory";
 
-interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache {
+export interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache {
   originalReadQuery: any;
 }
 
