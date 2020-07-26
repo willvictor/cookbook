@@ -22,7 +22,13 @@ jobs:
       - checkout
       - run:
           name: Run tests
-          command: cd cookbook-front-end && npm install && npm run test
+          command: cd cookbook-front-end && npm install && npm run ci-test
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+      - store_test_results:
+          path: ./cookbook-front-end/reports/junit/
+      - store_artifacts:
+          path: ./cookbook-front-end/reports/junit
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
