@@ -40,7 +40,9 @@ const useStyles = makeStyles(theme => ({
 
 const Recipes = () => {
   const classes = useStyles();
-  const { loading, error, data } = useQuery<RecipesResult>(GET_RECIPES);
+  const { loading, error, data } = useQuery<RecipesResult>(GET_RECIPES, {
+    variables: { recipeIds: null }
+  });
 
   if (loading) {
     return <CircularProgress />;
