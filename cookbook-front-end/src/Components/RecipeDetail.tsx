@@ -22,6 +22,10 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import { RecipesResult } from "../GraphqlQueryTypes/RecipesResultType";
 import { GET_APP_STATE } from "../GraphqlQueries/AppStateQuery";
 import { AppState } from "../GraphqlQueryTypes/AppStateType";
+import {
+  DeleteRecipeResultType,
+  DeleteRecipeResult
+} from "../GraphqlQueryTypes/DeleteRecipeResultType";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -53,13 +57,6 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-enum DeleteRecipeResult {
-  successfullyDeleted = 1,
-  recipeIdNotValid = 2,
-  notLoggedIn = 3,
-  sessionUserIsNotCreator = 4
-}
-
 const RecipeDetail = () => {
   let { recipeId } = useParams();
   recipeId = parseInt(recipeId);
@@ -83,20 +80,29 @@ const RecipeDetail = () => {
   const history = useHistory();
 
   const [deleteRecipe, { loading: deleteRecipeLoading }] = useMutation<
-    DeleteRecipeResult
+    DeleteRecipeResultType
   >(DELETE_RECIPE, {
     update: (cache, { data: deletedRecipeResult }) => {
-      if (deletedRecipeResult !== DeleteRecipeResult.successfullyDeleted) {
+      if (
+        deletedRecipeResult &&
+        deletedRecipeResult.deleteRecipe !==
+          DeleteRecipeResult.successfullyDeleted
+      ) {
         console.log("Did not successfully delete recipe");
       }
       const recipeResults = cache.readQuery<RecipesResult>({
-        query: GET_RECIPES
+        query: GET_RECIPES,
+        variables: {
+          recipeIds: null
+        }
       });
       if (recipeResults && recipeResults.recipes) {
         cache.writeQuery({
           query: GET_RECIPES,
+          variables: {
+            recipeIds: null
+          },
           data: {
-            ...recipeResults,
             recipes: recipeResults.recipes.filter(
               (recipe: any) => recipe.recipeId !== recipeId
             )
@@ -173,6 +179,7 @@ const RecipeDetail = () => {
                 edge="start"
                 color="inherit"
                 aria-label="home"
+                data-testid="delete-recipe-button"
                 onClick={() => setDeleteConfirmationOpen(true)}
               >
                 <DeleteIcon />

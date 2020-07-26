@@ -15,8 +15,11 @@ export const CREATE_RECIPE = gql`
     ) {
       recipeId
       name
+      directions
+      ingredients
       imageUrl
       creator {
+        userId
         firstName
         lastName
       }

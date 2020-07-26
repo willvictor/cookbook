@@ -72,11 +72,17 @@ const CreateRecipe = () => {
           return;
         }
         const recipesResult = cache.readQuery<RecipesResult>({
-          query: GET_RECIPES
+          query: GET_RECIPES,
+          variables: {
+            recipeIds: null
+          }
         });
         if (recipesResult) {
           cache.writeQuery({
             query: GET_RECIPES,
+            variables: {
+              recipeIds: null
+            },
             data: {
               recipes: recipesResult.recipes.concat([data.createRecipe])
             }
@@ -118,6 +124,9 @@ const CreateRecipe = () => {
                   setIsAnyEditMade
                 )
               }
+              inputProps={{
+                "data-testid": "recipeName"
+              }}
             />
           </div>
           <div className={classes.inputField}>
@@ -138,6 +147,9 @@ const CreateRecipe = () => {
                   setIsAnyEditMade
                 )
               }
+              inputProps={{
+                "data-testid": "ingredients"
+              }}
             />
           </div>
           <div className={classes.inputField}>
@@ -158,6 +170,9 @@ const CreateRecipe = () => {
                   setIsAnyEditMade
                 )
               }
+              inputProps={{
+                "data-testid": "directions"
+              }}
             />
           </div>
           <div className={classes.inputField}>
@@ -167,6 +182,9 @@ const CreateRecipe = () => {
               placeholder="Paste a url for an image hosted somewhere (like imgr)"
               className={classes.imageUrl}
               onChange={e => setImageUrl(e.target.value)}
+              inputProps={{
+                "data-testid": "imageUrl"
+              }}
             />
           </div>
           <Button

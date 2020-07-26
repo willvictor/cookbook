@@ -20,6 +20,9 @@ import { GoogleLogin } from "react-google-login";
 import { LOGIN } from "./GraphqlQueries/LoginQuery";
 import { GET_APP_STATE } from "./GraphqlQueries/AppStateQuery";
 import { AppState } from "./GraphqlQueryTypes/AppStateType";
+import ApolloClient from "apollo-boost";
+import { ApolloProvider } from "@apollo/react-hooks";
+import { InMemoryCache } from "apollo-cache-inmemory";
 
 const useStyles = makeStyles({
   root: {
@@ -36,6 +39,40 @@ const useStyles = makeStyles({
   }
 });
 
+export interface InMemoryCacheWithNullSafeReadQuery extends InMemoryCache {
+  originalReadQuery: any;
+}
+
+const AppApolloWrapper = () => {
+  let cache = new InMemoryCache() as InMemoryCacheWithNullSafeReadQuery;
+  // TODO: Monkey-patching in a fix for an open issue suggesting that
+  // `readQuery` should return null or undefined if the query is not yet in the
+  // cache: https://github.com/apollographql/apollo-feature-requests/issues/
+  // code copied from here: https://github.com/apollographql/apollo-feature-requests/issues/1#issuecomment-431842138
+  cache.originalReadQuery = cache.readQuery;
+  cache.readQuery = (...args) => {
+    try {
+      return cache.originalReadQuery(...args);
+    } catch (err) {
+      return undefined;
+    }
+  };
+  const client = new ApolloClient({
+    uri: "/graphql",
+    cache: cache,
+    resolvers: {}
+  });
+  const data = {
+    deletedRecipeToastIsOpen: false
+  };
+  cache.writeData({ data });
+  return (
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  );
+};
+
 const App = () => {
   const classes = useStyles();
   const [loginToastOpen, setLoginToastOpen] = useState(false);
@@ -48,6 +85,7 @@ const App = () => {
       const appStateToUpdate = cache.readQuery<AppState>({
         query: GET_APP_STATE
       });
+
       if (appStateToUpdate !== null) {
         cache.writeQuery({
           query: GET_APP_STATE,
@@ -74,7 +112,7 @@ const App = () => {
               aria-label="home"
             >
               <Link to="/" className={classes.routerLink}>
-                <HomeIcon />
+                <HomeIcon data-testid="home-button" />
               </Link>
             </IconButton>
             <Typography variant="h6" className={classes.title}>
@@ -172,4 +210,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default AppApolloWrapper;

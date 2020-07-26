@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  test:
+  test-back-end:
     docker:
       - image: circleci/node:10
       - image: circleci/postgres:12.1
@@ -15,6 +15,20 @@ jobs:
           path: ./cookbook-api/reports/junit/
       - store_artifacts:
           path: ./cookbook-api/reports/junit
+  test-front-end:
+    docker:
+      - image: circleci/node:10
+    steps:
+      - checkout
+      - run:
+          name: Run tests
+          command: cd cookbook-front-end && npm install && npm run ci-test
+          environment:
+            JEST_JUNIT_OUTPUT_DIR: ./reports/junit/
+      - store_test_results:
+          path: ./cookbook-front-end/reports/junit/
+      - store_artifacts:
+          path: ./cookbook-front-end/reports/junit
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
@@ -46,10 +60,12 @@ workflows:
   version: 2
   build-test-deploy:
     jobs:
-      - test
+      - test-back-end
+      - test-front-end
       - build-and-deploy:
           requires:
-            - test
+            - test-back-end
+            - test-front-end
           filters:
             branches:
               only: master
